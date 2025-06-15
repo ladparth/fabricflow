@@ -1,0 +1,20 @@
+[project]
+name = "fabricflow"
+description = "A code-first approach for MS Fabric data pipelines."
+version = "0.0.1"
+dependencies = ["requests"]
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Parth Lad", email = "parthlad3915@gmail.com" }]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.commands]
+build = "python -m build"
+install = "pip install -e ."
+test = "pytest"
