@@ -2,7 +2,7 @@
 name = "fabricflow"
 description = "A code-first approach for MS Fabric data pipelines."
 version = "0.0.1"
-dependencies = ["requests"]
+dependencies = ["requests", "sqlglot"]
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Parth Lad", email = "parthlad3915@gmail.com" }]
