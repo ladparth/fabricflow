@@ -4,7 +4,9 @@ import logging
 from logging import Logger
 from typing import Optional, List, Dict, Any
 from enum import Enum
-from sempy.fabric import FabricRestClient
+from sempy.fabric import FabricRestClient, resolve_item_id
+from ..core.workspaces.utils import get_workspace_id
+from ..core.items.types import FabricItemType
 
 logger: Logger = logging.getLogger(__name__)
 
@@ -38,8 +40,8 @@ class DataPipelineExecutor:
     def __init__(
         self,
         client: FabricRestClient,
-        workspace_id: str,
-        pipeline_id: str,
+        workspace: str,
+        pipeline: str,
         payload: Dict[str, Any],
         default_poll_timeout: int = 300,
         default_poll_interval: int = 15,
@@ -49,21 +51,25 @@ class DataPipelineExecutor:
 
         Args:
             client: The FabricRestClient instance for API calls
-            workspace_id: The Fabric workspace ID
-            pipeline_id: The pipeline ID to execute
+            workspace: The Fabric workspace name or ID
+            pipeline: The pipeline name or ID to execute
             payload: The JSON payload to send when triggering the pipeline
             default_poll_timeout: How long to wait for operations (seconds)
             default_poll_interval: How often to check status (seconds)
         """
         self.client = client
-        self.workspace_id = workspace_id
-        self.pipeline_id = pipeline_id
+        self.workspace_id = get_workspace_id(workspace)
+        self.pipeline_id = resolve_item_id(
+            pipeline,
+            item_type=FabricItemType.DATA_PIPELINE,
+            workspace=self.workspace_id,
+        )
         self.payload = payload
         self.default_poll_timeout = default_poll_timeout
         self.default_poll_interval = default_poll_interval
 
         logger.info(
-            f"DataPipelineExecutor initialized for workspace {workspace_id} and pipeline {pipeline_id}."
+            f"DataPipelineExecutor initialized for workspace {self.workspace_id} and pipeline {self.pipeline_id}."
         )
 
     def trigger_pipeline(self) -> Optional[str]:
