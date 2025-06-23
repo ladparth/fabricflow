@@ -9,6 +9,13 @@ from .core.workspaces.manager import FabricWorkspacesManager
 from .core.items.types import FabricItemType
 from .pipeline.templates import DataPipelineTemplates, get_template, get_base64_str
 from .pipeline.utils import create_data_pipeline
+from .core.connections import resolve_connection_id
+from .core.capacities import resolve_capacity_id
+from .copy.job.sinks.lakehouse_table import LakehouseTableSink
+from .copy.job.types import SinkType, SourceType
+from .copy.job.base import BaseSink, BaseSource
+from .copy.job.sources.sql_server import SQLServerSource
+from .copy.job.manager import CopyManager
 
 __all__: list[str] = [
     "DataPipelineExecutor",
@@ -24,6 +31,15 @@ __all__: list[str] = [
     "get_template",
     "get_base64_str",
     "create_data_pipeline",
+    "resolve_connection_id",
+    "resolve_capacity_id",
+    "LakehouseTableSink",
+    "SinkType",
+    "SourceType",
+    "BaseSink",
+    "BaseSource",
+    "SQLServerSource",
+    "CopyManager",
 ]
 
 logger: Logger = logging.getLogger(__name__)

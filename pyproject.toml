@@ -1,7 +1,7 @@
 [project]
 name = "fabricflow"
 description = "A code-first approach for MS Fabric data pipelines."
-version = "0.0.2"
+version = "0.0.3"
 dependencies = ["requests", "sqlglot"]
 readme = "README.md"
 license = "MIT"

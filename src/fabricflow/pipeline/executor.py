@@ -4,9 +4,10 @@ import logging
 from logging import Logger
 from typing import Optional, List, Dict, Any
 from enum import Enum
-from sempy.fabric import FabricRestClient, resolve_item_id
+from sempy.fabric import FabricRestClient
 from ..core.workspaces.utils import get_workspace_id
 from ..core.items.types import FabricItemType
+from ..core.items.utils import resolve_item
 
 logger: Logger = logging.getLogger(__name__)
 
@@ -59,10 +60,10 @@ class DataPipelineExecutor:
         """
         self.client = client
         self.workspace_id = get_workspace_id(workspace)
-        self.pipeline_id = resolve_item_id(
+        self.pipeline_id = resolve_item(
             pipeline,
-            item_type=FabricItemType.DATA_PIPELINE,
             workspace=self.workspace_id,
+            item_type=FabricItemType.DATA_PIPELINE,
         )
         self.payload = payload
         self.default_poll_timeout = default_poll_timeout
@@ -105,7 +106,7 @@ class DataPipelineExecutor:
             return job_instance_id
 
         except Exception as e:
-            error_msg = f"Error triggering pipeline {self.pipeline_id}: {e}"
+            error_msg: str = f"Error triggering pipeline {self.pipeline_id}: {e}"
             logger.error(error_msg)
             raise DataPipelineError(error_msg) from e
 

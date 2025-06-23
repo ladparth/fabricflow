@@ -3,8 +3,7 @@ import logging
 from logging import Logger
 from ..pipeline.executor import DataPipelineExecutor, DataPipelineError
 from .utils import extract_copy_activity_info
-from sempy.fabric import FabricRestClient, resolve_item_id
-from ..core.workspaces.utils import get_workspace_id
+from sempy.fabric import FabricRestClient
 
 logger: Logger = logging.getLogger(__name__)
 
@@ -45,14 +44,14 @@ class CopyActivityExecutor(DataPipelineExecutor):
             workspace,
             pipeline,
         )
-        self.client = client
-        self.workspace_id = get_workspace_id(workspace)
-
-        self.pipeline_id = resolve_item_id(self.workspace_id, pipeline)
-
-        self.payload = payload
-        self.default_poll_timeout = default_poll_timeout
-        self.default_poll_interval = default_poll_interval
+        super().__init__(
+            client=client,
+            workspace=workspace,
+            pipeline=pipeline,
+            payload=payload,
+            default_poll_timeout=default_poll_timeout,
+            default_poll_interval=default_poll_interval,
+        )
         logger.info(
             f"CopyActivityExecutor initialized for workspace {self.workspace_id} and pipeline {self.pipeline_id}."
         )
