@@ -97,17 +97,22 @@ class FabricCoreItemsManager:
         response = self.client.delete(url)
         response.raise_for_status()
 
-    def list_items(self, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def list_items(
+        self, params: Optional[Dict[str, Any]] = None, paged: bool = False
+    ) -> list | Dict[str, Any]:
         """
         List all items in the Fabric workspace, optionally filtered by parameters.
 
         Args:
             params (Optional[Dict[str, Any]]): Query parameters for filtering the items (optional).
+            paged (bool): If True, returns all pages as a flat list using get_paged().
 
         Returns:
-            Dict[str, Any]: The list of items as a dictionary.
+            list or Dict[str, Any]: The list of items (paged or single response).
         """
         url: str = f"/v1/workspaces/{self.workspace_id}/items"
+        if paged:
+            return self.client.get_paged(url, params=params)
         response = self.client.get(url, params=params)
         response.raise_for_status()
         return response.json()
