@@ -12,10 +12,12 @@ from .pipeline.utils import create_data_pipeline
 from .core.connections import resolve_connection_id
 from .core.capacities import resolve_capacity_id
 from .copy.job.sinks.lakehouse_table import LakehouseTableSink
+from .copy.job.sinks.parquet_file import ParquetFileSink
 from .copy.job.types import SinkType, SourceType
 from .copy.job.base import BaseSink, BaseSource
 from .copy.job.sources.sql_server import SQLServerSource
 from .copy.job.manager import CopyManager
+from .core.utils import create_workspace
 
 __all__: list[str] = [
     "DataPipelineExecutor",
@@ -34,12 +36,14 @@ __all__: list[str] = [
     "resolve_connection_id",
     "resolve_capacity_id",
     "LakehouseTableSink",
+    "ParquetFileSink",
     "SinkType",
     "SourceType",
     "BaseSink",
     "BaseSource",
     "SQLServerSource",
     "CopyManager",
+    "create_workspace",
 ]
 
 logger: Logger = logging.getLogger(__name__)

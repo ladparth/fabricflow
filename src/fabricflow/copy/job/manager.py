@@ -119,7 +119,7 @@ class CopyManager:
         if not self._payload["executionData"]["parameters"]:
             self.build()
 
-        pipeline_id, status, activity_data = CopyActivityExecutor(
+        result: dict[str, Any] = CopyActivityExecutor(
             client=self.client,
             workspace=self.workspace,
             pipeline=self.pipeline,
@@ -128,11 +128,7 @@ class CopyManager:
             default_poll_interval=self.default_poll_interval,
         ).run()
 
-        return {
-            "pipeline_id": pipeline_id,
-            "status": status,
-            "activity_data": activity_data,
-        }
+        return result
 
     def to_dict(self) -> dict[str, Any]:
         """
