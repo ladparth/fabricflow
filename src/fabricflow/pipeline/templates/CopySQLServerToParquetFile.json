@@ -1,0 +1,106 @@
+{
+  "name": "CopySQLServerToParquetFile",
+  "type": "pipelines",
+  "apiVersion": "2018-06-01",
+  "properties": {
+    "activities": [
+      {
+        "name": "Copy data",
+        "type": "Copy",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "SqlServerSource",
+            "sqlReaderQuery": {
+              "value": "@pipeline().parameters.source_query",
+              "type": "Expression"
+            },
+            "queryTimeout": "02:00:00",
+            "partitionOption": "None",
+            "datasetSettings": {
+              "annotations": [],
+              "type": "SqlServerTable",
+              "schema": [],
+              "typeProperties": {
+                "database": {
+                  "value": "@pipeline().parameters.source_database_name",
+                  "type": "Expression"
+                }
+              },
+              "externalReferences": {
+                "connection": "@pipeline().parameters.source_connection_id"
+              }
+            }
+          },
+          "sink": {
+            "type": "ParquetSink",
+            "storeSettings": { "type": "LakehouseWriteSettings" },
+            "formatSettings": {
+              "type": "ParquetWriteSettings",
+              "enableVertiParquet": true
+            },
+            "datasetSettings": {
+              "annotations": [],
+              "linkedService": {
+                "name": "9e7402c8_1e89_47fc_b562_5a59d5dab11a",
+                "properties": {
+                  "annotations": [],
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "workspaceId": "@pipeline().parameters.sink_workspace_id",
+                    "artifactId": "@pipeline().parameters.sink_lakehouse_id",
+                    "rootFolder": "Files"
+                  }
+                }
+              },
+              "type": "Parquet",
+              "typeProperties": {
+                "location": {
+                  "type": "LakehouseLocation",
+                  "fileName": {
+                    "value": "@pipeline().parameters.sink_file_name",
+                    "type": "Expression"
+                  },
+                  "folderPath": {
+                    "value": "@pipeline().parameters.sink_directory",
+                    "type": "Expression"
+                  }
+                },
+                "compressionCodec": "snappy"
+              },
+              "schema": []
+            }
+          },
+          "enableStaging": false,
+          "translator": {
+            "type": "TabularTranslator",
+            "typeConversion": true,
+            "typeConversionSettings": {
+              "allowDataTruncation": true,
+              "treatBooleanAsNumber": false
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "source_connection_id": { "type": "string" },
+      "source_database_name": { "type": "string" },
+      "source_query": { "type": "string" },
+      "sink_workspace_id": { "type": "string" },
+      "sink_lakehouse_id": { "type": "string" },
+      "sink_directory": { "type": "string" },
+      "sink_file_name": { "type": "string" }
+    },
+    "lastModifiedByObjectId": "f21bfa33-f194-4082-bf1a-48147398c081",
+    "lastPublishTime": "2025-06-27T01:34:56Z"
+  },
+  "dependsOn": []
+}

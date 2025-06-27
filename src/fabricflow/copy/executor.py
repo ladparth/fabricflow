@@ -2,7 +2,6 @@ from typing import Optional, List, Dict, Any
 import logging
 from logging import Logger
 from ..pipeline.executor import DataPipelineExecutor, DataPipelineError
-from .utils import extract_copy_activity_info
 from sempy.fabric import FabricRestClient
 
 logger: Logger = logging.getLogger(__name__)
@@ -107,30 +106,7 @@ class CopyActivityExecutor(DataPipelineExecutor):
                 len(result.get("activity_results", [])),
             )
 
-            # Extract copy-specific information
-            if not result.get("activity_results"):
-                logger.warning("No activity results found for copy activity extraction")
-                return {
-                    "pipeline_id": result.get("pipeline_id"),
-                    "status": result.get("status"),
-                    "activity_results": [],
-                }
-
-            extracted_info: list[dict[str, Any]] | None = extract_copy_activity_info(
-                result.get("activity_results", []),
-            )
-
-            logger.info(
-                "Extracted copy activity info for pipeline_id=%s (count=%d)",
-                result.get("pipeline_id"),
-                len(extracted_info) if extracted_info else 0,
-            )
-
-            return {
-                "pipeline_id": result.get("pipeline_id"),
-                "status": result.get("status"),
-                "activity_results": extracted_info,
-            }
+            return result
 
         except Exception as e:
             error_msg: str = f"Error in copy activity pipeline workflow: {e}"

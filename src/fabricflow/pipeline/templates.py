@@ -11,6 +11,9 @@ class DataPipelineTemplates(Enum):
     """
 
     COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE = "CopySQLServerToLakehouseTable"
+    COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH = "CopySQLServerToLakehouseTableForEach"
+    COPY_SQL_SERVER_TO_PARQUET_FILE = "CopySQLServerToParquetFile"
+    COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH = "CopySQLServerToParquetFileForEach"
 
 
 def get_base64_str(file_path: str) -> str:

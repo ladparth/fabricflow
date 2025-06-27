@@ -1,8 +1,8 @@
 [project]
 name = "fabricflow"
 description = "A code-first approach for MS Fabric data pipelines."
-version = "0.0.3"
-dependencies = ["requests", "sqlglot"]
+version = "0.0.1"
+dependencies = ["semantic-link-sempy>=0.8.0"]
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Parth Lad", email = "parthlad3915@gmail.com" }]
@@ -21,3 +21,5 @@ build-backend = "setuptools.build_meta"
 build = "python -m build"
 install = "pip install -e ."
 test = "pytest"
+testpypi = "twine upload --repository testpypi dist/*"
+pypi = "twine upload --repository pypi dist/*"
