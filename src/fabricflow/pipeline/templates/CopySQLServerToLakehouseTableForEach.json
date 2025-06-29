@@ -1,0 +1,114 @@
+{
+  "name": "CopySQLServerToLakehouseTable_ForEach",
+  "type": "pipelines",
+  "apiVersion": "2018-06-01",
+  "properties": {
+    "activities": [
+      {
+        "name": "For each item",
+        "type": "ForEach",
+        "dependsOn": [],
+        "typeProperties": {
+          "items": {
+            "value": "@pipeline().parameters.items",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "name": "Copy data",
+              "type": "Copy",
+              "dependsOn": [],
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureOutput": false,
+                "secureInput": false
+              },
+              "typeProperties": {
+                "source": {
+                  "type": "SqlServerSource",
+                  "sqlReaderQuery": {
+                    "value": "@item().source_query",
+                    "type": "Expression"
+                  },
+                  "queryTimeout": "02:00:00",
+                  "partitionOption": "None",
+                  "datasetSettings": {
+                    "annotations": [],
+                    "type": "SqlServerTable",
+                    "schema": [],
+                    "typeProperties": {
+                      "database": {
+                        "value": "@pipeline().parameters.source_database_name",
+                        "type": "Expression"
+                      }
+                    },
+                    "externalReferences": {
+                      "connection": "@pipeline().parameters.source_connection_id"
+                    }
+                  }
+                },
+                "sink": {
+                  "type": "LakehouseTableSink",
+                  "tableActionOption": {
+                    "value": "@item().sink_table_action",
+                    "type": "Expression"
+                  },
+                  "upsertSettings": {},
+                  "partitionOption": "None",
+                  "datasetSettings": {
+                    "annotations": [],
+                    "linkedService": {
+                      "name": "9e7402c8_1e89_47fc_b562_5a59d5dab11a",
+                      "properties": {
+                        "annotations": [],
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "workspaceId": "@pipeline().parameters.sink_workspace_id",
+                          "artifactId": "@pipeline().parameters.sink_lakehouse_id",
+                          "rootFolder": "Tables"
+                        }
+                      }
+                    },
+                    "type": "LakehouseTable",
+                    "schema": [],
+                    "typeProperties": {
+                      "schema": {
+                        "value": "@item().sink_table_name",
+                        "type": "Expression"
+                      },
+                      "table": {
+                        "value": "@item().sink_schema_name",
+                        "type": "Expression"
+                      }
+                    }
+                  }
+                },
+                "enableStaging": false,
+                "translator": {
+                  "type": "TabularTranslator",
+                  "typeConversion": true,
+                  "typeConversionSettings": {
+                    "allowDataTruncation": true,
+                    "treatBooleanAsNumber": false
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "parameters": {
+      "source_connection_id": { "type": "string" },
+      "source_database_name": { "type": "string" },
+      "items": { "type": "array" },
+      "sink_workspace_id": { "type": "string" },
+      "sink_lakehouse_id": { "type": "string" }
+    },
+    "lastModifiedByObjectId": "f21bfa33-f194-4082-bf1a-48147398c081",
+    "lastPublishTime": "2025-06-20T21:54:11Z"
+  },
+  "dependsOn": []
+}
