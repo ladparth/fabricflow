@@ -48,6 +48,7 @@ workspace_name = "FabricFlow"
 ```
 
 ### 4. Create Workspace (Optional)
+
 You can create a new workspace, or use an existing one by specifying its name.
 
 ```python
@@ -55,7 +56,9 @@ ff.create_workspace(fabric_client, workspace_name, capacity_name)
 ```
 
 ### 5. Deploy Data Pipeline Templates
+
 You can also create individual data pipeline templates by selecting specific templates from the list.
+
 ```python
 for template in ff.DataPipelineTemplates:
     ff.create_data_pipeline(
@@ -96,6 +99,8 @@ ITEMS_TO_LOAD = [
 
 You can copy data using either a single item per pipeline run (Option 1) or multiple items per pipeline run (Option 2). Choose the option that best fits your requirements.
 
+> **Note**: `CopyManager` now supports both `DataPipelineTemplates` enum values (recommended) and string values (for backward compatibility). Using enums provides better IDE support and prevents typos.
+
 #### Option 1: Single Item Per Pipeline Run
 
 ```python
@@ -103,7 +108,7 @@ You can copy data using either a single item per pipeline run (Option 1) or mult
 copy = ff.CopyManager(
     fabric_client,
     workspace_name,
-    ff.DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE.value
+    ff.DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE
 )
 
 source = ff.SQLServerSource(
@@ -135,7 +140,7 @@ result = (
 copy = ff.CopyManager(
     fabric_client,
     workspace_name,
-    ff.DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH.value
+    ff.DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH
 )
 
 source = ff.SQLServerSource(

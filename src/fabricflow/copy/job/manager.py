@@ -1,5 +1,7 @@
 from typing import Optional, Any
 from sempy.fabric import FabricRestClient
+
+from ...pipeline.templates import DataPipelineTemplates
 from .base import BaseSource, BaseSink
 from ..executor import CopyActivityExecutor
 import json
@@ -11,18 +13,31 @@ class CopyManager:
 
     This class enforces the use of prefixed parameter names (e.g., source_*, sink_*) for clarity and consistency.
     Supports passing source and sink parameters directly or as a list of dicts (items), as long as all required keys are present.
+    
+    Args:
+        client (FabricRestClient): The Fabric REST client for API interactions.
+        workspace (str): The name or ID of the Fabric workspace.
+        pipeline (str | DataPipelineTemplates): The name or ID of the pipeline to execute, or a DataPipelineTemplates enum value.
+        default_poll_timeout (int): Default timeout for polling the pipeline execution status.
+        default_poll_interval (int): Default interval for polling the pipeline execution status.
+
     """
 
     def __init__(
         self,
         client: FabricRestClient,
         workspace: str,
-        pipeline: str,
+        pipeline: str | DataPipelineTemplates,
         default_poll_timeout: int = 300,
         default_poll_interval: int = 15,
     ) -> None:
         self.workspace = workspace
-        self.pipeline = pipeline
+
+        if isinstance(pipeline, DataPipelineTemplates):
+            self.pipeline = pipeline.value
+        else:
+            self.pipeline = pipeline
+
         self.client = client
         self._source: Optional[BaseSource] = None
         self._sink: Optional[BaseSink] = None
