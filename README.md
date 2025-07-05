@@ -12,6 +12,7 @@
 - **Workspace & Item Management**: CRUD operations for workspaces and core items.
 - **Connection & Capacity Utilities**: Resolve and manage connections and capacities.
 - **Logging Utilities**: Simple logging setup for consistent diagnostics.
+- **Service Principal Authentication**: Authenticate securely with Microsoft Fabric REST API using Azure Service Principal credentials.
 
 ---
 
@@ -191,6 +192,7 @@ Below are the main classes and functions available in FabricFlow:
 - `BaseSource` – Base class for sources.
 - `CopyManager` – Orchestrates and runs copy operations using predefined templates.
 - `create_workspace` – Create a new workspace and assign to a capacity.
+- `ServicePrincipalTokenProvider` – Handles Azure Service Principal authentication.
 
 ---
 
