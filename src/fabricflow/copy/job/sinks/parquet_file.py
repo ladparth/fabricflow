@@ -31,22 +31,24 @@ class ParquetFileSink(BaseSink):
         self,
         sink_lakehouse: str,
         sink_workspace: str,
-        sink_file_name: Optional[str] = None,
         sink_directory: Optional[str] = None,
+        sink_file_name: Optional[str] = None,
         sink_table_action: Optional[str] = None,
     ) -> None:
         super().__init__()
 
         # Resolve workspace and lakehouse to IDs if needed
         self.sink_workspace_id = resolve_workspace_id(sink_workspace)
+        
+        if not self.sink_workspace_id:
+            raise ValueError("sink_workspace (name or id) could not be resolved.")
+        
         self.sink_lakehouse_id = resolve_item(
             sink_lakehouse, FabricItemType.LAKEHOUSE, self.sink_workspace_id
         )
 
         if not self.sink_lakehouse_id:
             raise ValueError("sink_lakehouse (name or id) could not be resolved.")
-        if not self.sink_workspace_id:
-            raise ValueError("sink_workspace (name or id) could not be resolved.")
 
         self.sink_file_name = sink_file_name
         self.sink_directory = sink_directory

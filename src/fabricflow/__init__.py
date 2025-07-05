@@ -18,6 +18,7 @@ from .copy.job.base import BaseSink, BaseSource
 from .copy.job.sources.sql_server import SQLServerSource
 from .copy.job.manager import CopyManager
 from .core.utils import create_workspace
+from .auth.provider import ServicePrincipalTokenProvider
 
 __all__: list[str] = [
     "DataPipelineExecutor",
@@ -44,6 +45,7 @@ __all__: list[str] = [
     "SQLServerSource",
     "CopyManager",
     "create_workspace",
+    "ServicePrincipalTokenProvider",
 ]
 
 logger: Logger = logging.getLogger(__name__)

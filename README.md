@@ -1,5 +1,10 @@
 # FabricFlow
 
+[![PyPI version](https://badge.fury.io/py/fabricflow.svg?icon=si%3Apython)](https://badge.fury.io/py/fabricflow)
+[![PyPI Downloads](https://static.pepy.tech/badge/fabricflow)](https://pepy.tech/projects/fabricflow)
+
+---
+
 **FabricFlow** is a code-first Python SDK for building, managing, and automating Microsoft Fabric data pipelines, workspaces, and core items. It provides a high-level, object-oriented interface for interacting with the Microsoft Fabric REST API, enabling you to create, execute, and monitor data pipelines programmatically.
 
 ---
@@ -12,6 +17,7 @@
 - **Workspace & Item Management**: CRUD operations for workspaces and core items.
 - **Connection & Capacity Utilities**: Resolve and manage connections and capacities.
 - **Logging Utilities**: Simple logging setup for consistent diagnostics.
+- **Service Principal Authentication**: Authenticate securely with Microsoft Fabric REST API using Azure Service Principal credentials.
 
 ---
 
@@ -48,6 +54,7 @@ workspace_name = "FabricFlow"
 ```
 
 ### 4. Create Workspace (Optional)
+
 You can create a new workspace, or use an existing one by specifying its name.
 
 ```python
@@ -55,7 +62,9 @@ ff.create_workspace(fabric_client, workspace_name, capacity_name)
 ```
 
 ### 5. Deploy Data Pipeline Templates
+
 You can also create individual data pipeline templates by selecting specific templates from the list.
+
 ```python
 for template in ff.DataPipelineTemplates:
     ff.create_data_pipeline(
@@ -96,6 +105,8 @@ ITEMS_TO_LOAD = [
 
 You can copy data using either a single item per pipeline run (Option 1) or multiple items per pipeline run (Option 2). Choose the option that best fits your requirements.
 
+> **Note**: `CopyManager` now supports both `DataPipelineTemplates` enum values (recommended) and string values (for backward compatibility). Using enums provides better IDE support and prevents typos.
+
 #### Option 1: Single Item Per Pipeline Run
 
 ```python
@@ -103,7 +114,7 @@ You can copy data using either a single item per pipeline run (Option 1) or mult
 copy = ff.CopyManager(
     fabric_client,
     workspace_name,
-    ff.DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE.value
+    ff.DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE
 )
 
 source = ff.SQLServerSource(
@@ -135,7 +146,7 @@ result = (
 copy = ff.CopyManager(
     fabric_client,
     workspace_name,
-    ff.DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH.value
+    ff.DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH
 )
 
 source = ff.SQLServerSource(
@@ -186,6 +197,7 @@ Below are the main classes and functions available in FabricFlow:
 - `BaseSource` – Base class for sources.
 - `CopyManager` – Orchestrates and runs copy operations using predefined templates.
 - `create_workspace` – Create a new workspace and assign to a capacity.
+- `ServicePrincipalTokenProvider` – Handles Azure Service Principal authentication.
 
 ---
 
