@@ -1,5 +1,10 @@
 # FabricFlow
 
+[![PyPI version](https://badge.fury.io/py/fabricflow.svg?icon=si%3Apython)](https://badge.fury.io/py/fabricflow)
+[![PyPI Downloads](https://static.pepy.tech/badge/fabricflow)](https://pepy.tech/projects/fabricflow)
+
+---
+
 **FabricFlow** is a code-first Python SDK for building, managing, and automating Microsoft Fabric data pipelines, workspaces, and core items. It provides a high-level, object-oriented interface for interacting with the Microsoft Fabric REST API, enabling you to create, execute, and monitor data pipelines programmatically.
 
 ---
