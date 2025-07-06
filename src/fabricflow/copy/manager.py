@@ -1,9 +1,10 @@
 from typing import Optional, Any
 from sempy.fabric import FabricRestClient
 
-from ...pipeline.templates import DataPipelineTemplates
-from .base import BaseSource, BaseSink
-from ..executor import CopyActivityExecutor
+from ..pipeline.templates import DataPipelineTemplates
+from ..pipeline.sources.base import BaseSource
+from ..pipeline.sinks.base import BaseSink
+from .executor import CopyActivityExecutor
 import json
 
 
@@ -13,7 +14,7 @@ class CopyManager:
 
     This class enforces the use of prefixed parameter names (e.g., source_*, sink_*) for clarity and consistency.
     Supports passing source and sink parameters directly or as a list of dicts (items), as long as all required keys are present.
-    
+
     Args:
         client (FabricRestClient): The Fabric REST client for API interactions.
         workspace (str): The name or ID of the Fabric workspace.
