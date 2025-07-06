@@ -1,14 +1,14 @@
 from typing import Optional, Any
 from sempy.fabric import FabricRestClient
 
-from ..pipeline.templates import DataPipelineTemplates
-from ..pipeline.sources.base import BaseSource
-from ..pipeline.sinks.base import BaseSink
+from ...templates import DataPipelineTemplates
+from ...sources.base import BaseSource
+from ...sinks.base import BaseSink
 from .executor import CopyActivityExecutor
 import json
 
 
-class CopyManager:
+class Copy:
     """
     Builder class for creating copy activity parameters for Microsoft Fabric Data Pipelines.
 
@@ -47,46 +47,46 @@ class CopyManager:
         self.default_poll_timeout = default_poll_timeout
         self.default_poll_interval = default_poll_interval
 
-    def source(self, source: BaseSource) -> "CopyManager":
+    def source(self, source: BaseSource) -> "Copy":
         """
         Sets the source for the copy activity.
         Args:
             source (BaseSource): The source object (with source_*-prefixed params).
         Returns:
-            CopyManager: The builder instance.
+            Copy: The builder instance.
         """
         self._source = source
         return self
 
-    def sink(self, sink: BaseSink) -> "CopyManager":
+    def sink(self, sink: BaseSink) -> "Copy":
         """
         Sets the sink for the copy activity.
         Args:
             sink (BaseSink): The sink object (with sink_*-prefixed params).
         Returns:
-            CopyManager: The builder instance.
+            Copy: The builder instance.
         """
         self._sink = sink
         return self
 
-    def params(self, **kwargs) -> "CopyManager":
+    def params(self, **kwargs) -> "Copy":
         """
         Sets additional parameters for the copy activity.
         Args:
             **kwargs: Additional parameters to set.
         Returns:
-            CopyManager: The builder instance.
+            Copy: The builder instance.
         """
         self._extra_params.update(kwargs)
         return self
 
-    def items(self, items: list[dict]) -> "CopyManager":
+    def items(self, items: list[dict]) -> "Copy":
         """
         Sets additional parameters for the copy activity using items.
         Args:
             items (list): A list of dicts, each containing all required source_*/sink_* keys.
         Returns:
-            CopyManager: The builder instance.
+            Copy: The builder instance.
         Raises:
             ValueError: If any item is missing required keys.
         """
@@ -105,11 +105,11 @@ class CopyManager:
         self._extra_params["items"] = items
         return self
 
-    def build(self) -> "CopyManager":
+    def build(self) -> "Copy":
         """
         Builds the copy activity parameters.
         Returns:
-            CopyManager: The builder instance with payload ready for execution.
+            Copy: The builder instance with payload ready for execution.
         Raises:
             ValueError: If source or sink is not set.
         """
@@ -148,11 +148,11 @@ class CopyManager:
 
     def to_dict(self) -> dict[str, Any]:
         """
-        Converts the CopyManager object to a dictionary representation.
+        Converts the Copy object to a dictionary representation.
         This includes the workspace, pipeline, source, sink, and extra parameters.
 
         Returns:
-            dict: Dictionary representation of the CopyManager object.
+            dict: Dictionary representation of the Copy object.
         """
         return {
             "workspace": self.workspace,
@@ -163,7 +163,7 @@ class CopyManager:
     def __str__(self) -> str:
         """
 
-        Returns a JSON string representation of the CopyManager object.
+        Returns a JSON string representation of the Copy object.
         This includes the workspace, pipeline, source, sink, and extra parameters.
 
         """
@@ -172,6 +172,6 @@ class CopyManager:
 
     def __repr__(self) -> str:
         """
-        Returns a string representation of the CopyManager object.
+        Returns a string representation of the Copy object.
         """
         return self.__str__()

@@ -14,6 +14,7 @@ class DataPipelineTemplates(Enum):
     COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH = "CopySQLServerToLakehouseTableForEach"
     COPY_SQL_SERVER_TO_PARQUET_FILE = "CopySQLServerToParquetFile"
     COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH = "CopySQLServerToParquetFileForEach"
+    LOOKUP_SQL_SERVER = "LookupSQLServer"
 
 
 def get_base64_str(file_path: str) -> str:
@@ -64,22 +65,3 @@ def get_template(template: DataPipelineTemplates) -> dict:
             ]
         }
     }
-
-
-# Example usage:
-# if __name__ == "__main__":
-#     from typing import Literal
-#     template: Literal[DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE] = (
-#         DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE
-#     )
-#     try:
-#         template_definition: dict = get_template(template)
-#         print(template_definition)
-#     except FileNotFoundError as e:
-#         print(e)
-#         print(
-#             {
-#                 "template": template.value,
-#                 "parameters": {},
-#             }
-#         )

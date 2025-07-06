@@ -1,20 +1,20 @@
 from typing import Optional, List, Dict, Any
 import logging
 from logging import Logger
-from ..pipeline.executor import DataPipelineExecutor, DataPipelineError
+from ...executor import DataPipelineExecutor, DataPipelineError
 from sempy.fabric import FabricRestClient
 
 logger: Logger = logging.getLogger(__name__)
 
 
-class CopyActivityExecutor(DataPipelineExecutor):
+class LookupActivityExecutor(DataPipelineExecutor):
     """
-    Specialized client for pipelines that contain copy activities.
+    Specialized client for pipelines that contain lookup activities.
 
     This class extends DataPipelineExecutor to:
-    - Automatically filter for copy activities
-    - Extract and process copy activity information
-    - Provide copy-specific functionality
+    - Automatically filter for lookup activities
+    - Extract and process lookup activity information
+    - Provide lookup-specific functionality
     """
 
     def __init__(
@@ -27,7 +27,7 @@ class CopyActivityExecutor(DataPipelineExecutor):
         default_poll_interval: int = 15,
     ) -> None:
         """
-        Initialize the CopyActivityExecutor.
+        Initialize the LookupActivityExecutor.
 
         Args:
             client: The FabricRestClient instance for API calls
@@ -39,7 +39,7 @@ class CopyActivityExecutor(DataPipelineExecutor):
         """
 
         logger.info(
-            "Initializing CopyActivityExecutor with workspace=%s, pipeline=%s",
+            "Initializing LookupActivityExecutor with workspace=%s, pipeline=%s",
             workspace,
             pipeline,
         )
@@ -52,49 +52,49 @@ class CopyActivityExecutor(DataPipelineExecutor):
             default_poll_interval=default_poll_interval,
         )
         logger.info(
-            f"CopyActivityExecutor initialized for workspace {self.workspace_id} and pipeline {self.pipeline_id}."
+            f"LookupActivityExecutor initialized for workspace {self.workspace_id} and pipeline {self.pipeline_id}."
         )
 
-    def get_copy_activity_filter(self) -> List[Dict[str, Any]]:
+    def get_lookup_activity_filter(self) -> List[Dict[str, Any]]:
         """
-        Get the default filter for copy activities.
+        Get the default filter for lookup activities.
 
         Returns:
-            List containing the copy activity filter
+            List containing the lookup activity filter
         """
-        return [{"operand": "ActivityType", "operator": "Equals", "values": ["Copy"]}]
+        return [{"operand": "ActivityType", "operator": "Equals", "values": ["Lookup"]}]
 
     def run(
         self, query_activity_runs_filters: Optional[List[Dict[str, Any]]] = None
     ) -> dict[str, Any]:
         """
-        Execute the pipeline workflow specifically for copy activities.
+        Execute the pipeline workflow specifically for lookup activities.
 
         This method:
         1. Runs the base pipeline workflow
-        2. Automatically filters for copy activities (if no filters provided)
-        3. Extracts copy-specific information from the results
+        2. Automatically filters for lookup activities (if no filters provided)
+        3. Extracts lookup-specific information from the results
 
         Args:
             query_activity_runs_filters: Optional filters for activity run queries.
-                                       If None, defaults to copy activity filter.
+                                         If None, defaults to lookup activity filter.
 
         Returns:
-            dict containing pipeline_id, final_status, and extracted_copy_info
+            dict containing pipeline_id, final_status, and extracted_lookup_info
 
         Raises:
-            DataPipelineError: If the pipeline execution or copy extraction fails
+            DataPipelineError: If the pipeline execution or lookup extraction fails
         """
         logger.info(
-            "Running copy activity pipeline with filters: %s",
+            "Running lookup activity pipeline with filters: %s",
             query_activity_runs_filters,
         )
 
         try:
-            # Use copy activity filter if no filters provided
+            # Use lookup activity filter if no filters provided
             if query_activity_runs_filters is None:
-                query_activity_runs_filters = self.get_copy_activity_filter()
-                logger.info("Using default copy activity filter")
+                query_activity_runs_filters = self.get_lookup_activity_filter()
+                logger.info("Using default lookup activity filter")
 
             # Run the base pipeline workflow
             result: dict[str, Any] = super().run(query_activity_runs_filters)
@@ -109,7 +109,7 @@ class CopyActivityExecutor(DataPipelineExecutor):
             return result
 
         except Exception as e:
-            error_msg: str = f"Error in copy activity pipeline workflow: {e}"
+            error_msg: str = f"Error in lookup activity pipeline workflow: {e}"
             logger.error(error_msg)
             if isinstance(e, DataPipelineError):
                 raise

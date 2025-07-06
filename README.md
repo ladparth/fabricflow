@@ -195,9 +195,32 @@ Below are the main classes and functions available in FabricFlow:
 - `SourceType` – Enum for source types.
 - `BaseSink` – Base class for sinks.
 - `BaseSource` – Base class for sources.
-- `CopyManager` – Orchestrates and runs copy operations using predefined templates.
+- **Activities**: `Copy`, `Lookup` – Build and execute pipeline activities.
 - `create_workspace` – Create a new workspace and assign to a capacity.
 - `ServicePrincipalTokenProvider` – Handles Azure Service Principal authentication.
+
+---
+
+## Activities, Sources, and Sinks
+
+All pipeline activities, sources, and sinks are also available under their respective submodules:
+
+- **Activities:**  
+  `from fabricflow.pipeline.activities import Copy, Lookup`
+- **Sources:**  
+  `from fabricflow.pipeline.sources import SQLServerSource, ...`
+- **Sinks:**  
+  `from fabricflow.pipeline.sinks import LakehouseTableSink, ParquetFileSink, ...`
+
+### Lookup Activity Support
+
+FabricFlow now supports the `Lookup` activity, allowing you to execute lookup operations in your pipelines.  
+You can use the `Lookup` class directly from `fabricflow.pipeline.activities`.
+
+### CopyManager → Copy
+
+The `CopyManager` class is now renamed to `Copy` for consistency.  
+**Existing code using `CopyManager` will continue to work** (backward compatible), but new code should use `Copy`.
 
 ---
 
