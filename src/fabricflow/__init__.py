@@ -11,12 +11,9 @@ from .pipeline.templates import DataPipelineTemplates, get_template, get_base64_
 from .pipeline.utils import create_data_pipeline
 from .core.connections import resolve_connection_id
 from .core.capacities import resolve_capacity_id
-from .copy.job.sinks.lakehouse_table import LakehouseTableSink
-from .copy.job.sinks.parquet_file import ParquetFileSink
-from .copy.job.types import SinkType, SourceType
-from .copy.job.base import BaseSink, BaseSource
-from .copy.job.sources.sql_server import SQLServerSource
-from .copy.job.manager import CopyManager
+from .pipeline.sinks import LakehouseTableSink, ParquetFileSink, BaseSink, SinkType
+from .pipeline.sources import BaseSource, SQLServerSource, SourceType
+from .copy.manager import CopyManager
 from .core.utils import create_workspace
 from .auth.provider import ServicePrincipalTokenProvider
 

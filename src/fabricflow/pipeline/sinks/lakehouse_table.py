@@ -1,11 +1,11 @@
-from ..base import BaseSink
-from ..types import SinkType
+from .base import BaseSink
+from .types import SinkType
 import logging
 from logging import Logger
 from typing import Optional
 from sempy.fabric import resolve_workspace_id
-from ....core.items.utils import resolve_item
-from ....core.items.types import FabricItemType
+from ...core.items.utils import resolve_item
+from ...core.items.types import FabricItemType
 
 logger: Logger = logging.getLogger(__name__)
 

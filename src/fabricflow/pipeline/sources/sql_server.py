@@ -1,5 +1,5 @@
-from ..base import BaseSource
-from ..types import SourceType
+from .base import BaseSource
+from .types import SourceType
 from logging import Logger
 import logging
 from typing import Optional

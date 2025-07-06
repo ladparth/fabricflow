@@ -1,11 +1,11 @@
-from ..base import BaseSink
-from ..types import SinkType
+from .base import BaseSink
+from .types import SinkType
 import logging
 from logging import Logger
 from typing import Optional
 from sempy.fabric import resolve_workspace_id
-from ....core.items.utils import resolve_item
-from ....core.items.types import FabricItemType
+from ...core.items.utils import resolve_item
+from ...core.items.types import FabricItemType
 
 logger: Logger = logging.getLogger(__name__)
 
@@ -39,10 +39,10 @@ class ParquetFileSink(BaseSink):
 
         # Resolve workspace and lakehouse to IDs if needed
         self.sink_workspace_id = resolve_workspace_id(sink_workspace)
-        
+
         if not self.sink_workspace_id:
             raise ValueError("sink_workspace (name or id) could not be resolved.")
-        
+
         self.sink_lakehouse_id = resolve_item(
             sink_lakehouse, FabricItemType.LAKEHOUSE, self.sink_workspace_id
         )
