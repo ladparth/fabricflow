@@ -82,13 +82,22 @@ class Lookup:
             raise ValueError("Source must be set before setting items.")
         required_keys: list[str] = self._source.required_params.copy()
 
-        if "first_row_only" not in required_keys:
-            required_keys.append("first_row_only")
+        source_dict = self._source.to_dict()
         for item in items:
+
             if not all(key in item for key in required_keys):
                 raise ValueError(
                     f"Each item must contain the following keys: {required_keys}"
                 )
+
+            if "query_timeout" in source_dict:
+                item["query_timeout"] = source_dict["query_timeout"]
+
+            if "isolation_level" not in item:
+                item["isolation_level"] = None
+
+            if "first_row_only" not in item:
+                item["first_row_only"] = False
 
         self._extra_params["items"] = items
         return self

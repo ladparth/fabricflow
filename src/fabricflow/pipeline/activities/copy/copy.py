@@ -101,6 +101,12 @@ class Copy:
                 raise ValueError(
                     f"Each item must contain the following keys: {required_keys}"
                 )
+            source_dict = self._source.to_dict()
+            if "query_timeout" in source_dict:
+                item["query_timeout"] = source_dict["query_timeout"]
+
+            if "isolation_level" not in item:
+                item["isolation_level"] = None
 
         self._extra_params["items"] = items
         return self

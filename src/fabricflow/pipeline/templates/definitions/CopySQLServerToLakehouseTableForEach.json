@@ -1,5 +1,5 @@
 {
-  "name": "CopySQLServerToLakehouseTable_ForEach",
+  "name": "CopySQLServerToLakehouseTableForEach",
   "type": "pipelines",
   "apiVersion": "2018-06-01",
   "properties": {
@@ -32,7 +32,14 @@
                     "value": "@item().source_query",
                     "type": "Expression"
                   },
-                  "queryTimeout": "02:00:00",
+                  "queryTimeout": {
+                    "value": "@item().query_timeout",
+                    "type": "Expression"
+                  },
+                  "isolationLevel": {
+                    "value": "@item().isolation_level",
+                    "type": "Expression"
+                  },
                   "partitionOption": "None",
                   "datasetSettings": {
                     "annotations": [],

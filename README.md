@@ -1,6 +1,6 @@
 # FabricFlow
 
-[![PyPI version](https://badge.fury.io/py/fabricflow.svg?icon=si%3Apython)](https://badge.fury.io/py/fabricflow)
+[![PyPI version](https://img.shields.io/pypi/v/fabricflow?logo=python&logoColor=white&label=PyPI&color=2ecc40)](https://pypi.org/project/fabricflow/)
 [![PyPI Downloads](https://static.pepy.tech/badge/fabricflow)](https://pepy.tech/projects/fabricflow)
 
 ---

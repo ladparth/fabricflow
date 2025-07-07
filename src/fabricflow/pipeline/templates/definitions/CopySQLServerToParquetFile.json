@@ -1,5 +1,5 @@
 {
-  "name": "CopySQLServerToLakehouseTable",
+  "name": "CopySQLServerToParquetFile",
   "type": "pipelines",
   "apiVersion": "2018-06-01",
   "properties": {
@@ -22,7 +22,14 @@
               "value": "@pipeline().parameters.source_query",
               "type": "Expression"
             },
-            "queryTimeout": "02:00:00",
+            "queryTimeout": {
+              "value": "@pipeline().parameters.query_timeout",
+              "type": "Expression"
+            },
+            "isolationLevel": {
+              "value": "@pipeline().parameters.isolation_level",
+              "type": "Expression"
+            },
             "partitionOption": "None",
             "datasetSettings": {
               "annotations": [],
@@ -40,13 +47,12 @@
             }
           },
           "sink": {
-            "type": "LakehouseTableSink",
-            "tableActionOption": {
-              "value": "@pipeline().parameters.sink_table_action",
-              "type": "Expression"
+            "type": "ParquetSink",
+            "storeSettings": { "type": "LakehouseWriteSettings" },
+            "formatSettings": {
+              "type": "ParquetWriteSettings",
+              "enableVertiParquet": true
             },
-            "upsertSettings": {},
-            "partitionOption": "None",
             "datasetSettings": {
               "annotations": [],
               "linkedService": {
@@ -57,22 +63,26 @@
                   "typeProperties": {
                     "workspaceId": "@pipeline().parameters.sink_workspace_id",
                     "artifactId": "@pipeline().parameters.sink_lakehouse_id",
-                    "rootFolder": "Tables"
+                    "rootFolder": "Files"
                   }
                 }
               },
-              "type": "LakehouseTable",
-              "schema": [],
+              "type": "Parquet",
               "typeProperties": {
-                "schema": {
-                  "value": "@pipeline().parameters.sink_table_name",
-                  "type": "Expression"
+                "location": {
+                  "type": "LakehouseLocation",
+                  "fileName": {
+                    "value": "@pipeline().parameters.sink_file_name",
+                    "type": "Expression"
+                  },
+                  "folderPath": {
+                    "value": "@pipeline().parameters.sink_directory",
+                    "type": "Expression"
+                  }
                 },
-                "table": {
-                  "value": "@pipeline().parameters.sink_schema_name",
-                  "type": "Expression"
-                }
-              }
+                "compressionCodec": "snappy"
+              },
+              "schema": []
             }
           },
           "enableStaging": false,
@@ -93,12 +103,13 @@
       "source_query": { "type": "string" },
       "sink_workspace_id": { "type": "string" },
       "sink_lakehouse_id": { "type": "string" },
-      "sink_table_name": { "type": "string" },
-      "sink_schema_name": { "type": "string" },
-      "sink_table_action": { "type": "string" }
+      "sink_directory": { "type": "string" },
+      "sink_file_name": { "type": "string" },
+      "isolation_level": { "type": "string" },
+      "query_timeout": { "type": "string" }
     },
     "lastModifiedByObjectId": "f21bfa33-f194-4082-bf1a-48147398c081",
-    "lastPublishTime": "2025-06-20T21:28:14Z"
+    "lastPublishTime": "2025-06-27T01:34:56Z"
   },
   "dependsOn": []
 }

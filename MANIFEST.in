@@ -1,1 +1,1 @@
-recursive-include src/fabricflow/pipeline/templates *.json
+recursive-include src/fabricflow/pipeline/templates/definitions *.json
