@@ -1,0 +1,78 @@
+{
+  "name": "LookupSQLServerForEach",
+  "type": "pipelines",
+  "apiVersion": "2018-06-01",
+  "properties": {
+    "activities": [
+      {
+        "name": "ForEach",
+        "type": "ForEach",
+        "dependsOn": [],
+        "typeProperties": {
+          "items": {
+            "value": "@pipeline().parameters.items",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "name": "Lookup",
+              "type": "Lookup",
+              "dependsOn": [],
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureOutput": false,
+                "secureInput": false
+              },
+              "typeProperties": {
+                "source": {
+                  "type": "SqlServerSource",
+                  "sqlReaderQuery": {
+                    "value": "@item().source_query",
+                    "type": "Expression"
+                  },
+                  "queryTimeout": {
+                    "value": "@item().query_timeout",
+                    "type": "Expression"
+                  },
+                  "isolationLevel": {
+                    "value": "@item().isolation_level",
+                    "type": "Expression"
+                  },
+                  "partitionOption": "None"
+                },
+                "firstRowOnly": {
+                  "value": "@item().first_row_only",
+                  "type": "Expression"
+                },
+                "datasetSettings": {
+                  "annotations": [],
+                  "type": "SqlServerTable",
+                  "schema": [],
+                  "typeProperties": {
+                    "database": {
+                      "value": "@pipeline().parameters.source_database_name",
+                      "type": "Expression"
+                    }
+                  },
+                  "externalReferences": {
+                    "connection": "@pipeline().parameters.source_connection_id"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "parameters": {
+      "source_connection_id": { "type": "string" },
+      "source_database_name": { "type": "string" },
+      "items": { "type": "array" }
+    },
+    "lastModifiedByObjectId": "f21bfa33-f194-4082-bf1a-48147398c081",
+    "lastPublishTime": "2025-07-07T14:11:09Z"
+  },
+  "dependsOn": []
+}

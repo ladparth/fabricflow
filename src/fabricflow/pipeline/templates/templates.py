@@ -15,6 +15,22 @@ class DataPipelineTemplates(Enum):
     COPY_SQL_SERVER_TO_PARQUET_FILE = "CopySQLServerToParquetFile"
     COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH = "CopySQLServerToParquetFileForEach"
     LOOKUP_SQL_SERVER = "LookupSQLServer"
+    LOOKUP_SQL_SERVER_FOR_EACH = "LookupSQLServerForEach"
+
+
+# Exporting the templates individually for convenience
+COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE = (
+    DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE
+)
+COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH = (
+    DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH
+)
+COPY_SQL_SERVER_TO_PARQUET_FILE = DataPipelineTemplates.COPY_SQL_SERVER_TO_PARQUET_FILE
+COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH = (
+    DataPipelineTemplates.COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH
+)
+LOOKUP_SQL_SERVER = DataPipelineTemplates.LOOKUP_SQL_SERVER
+LOOKUP_SQL_SERVER_FOR_EACH = DataPipelineTemplates.LOOKUP_SQL_SERVER_FOR_EACH
 
 
 def get_base64_str(file_path: str) -> str:
@@ -49,7 +65,7 @@ def get_template(template: DataPipelineTemplates) -> dict:
     Raises:
         FileNotFoundError: If the template file does not exist.
     """
-    template_dir: str = os.path.join(os.path.dirname(__file__), "templates")
+    template_dir: str = os.path.join(os.path.dirname(__file__), "definitions")
     template_path: str = os.path.join(template_dir, f"{template.value}.json")
 
     base64_str: str = get_base64_str(template_path)
