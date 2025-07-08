@@ -1,3 +1,25 @@
+"""
+Microsoft Fabric Data Pipeline Templates.
+
+This module provides pre-built pipeline templates for common data integration
+scenarios in Microsoft Fabric. Templates are stored as JSON files and can be
+used to quickly create data pipelines for specific source-to-sink patterns.
+
+Classes:
+    DataPipelineTemplates: Enum containing all available pipeline templates.
+
+Functions:
+    get_template: Retrieve a template definition ready for Fabric API.
+    get_base64_str: Utility function to encode template files as base64.
+
+Template Categories:
+    - Copy Activities: SQL Server to Lakehouse/Parquet with single or batch processing
+    - Lookup Activities: SQL Server lookup operations with optional ForEach loops
+
+All templates support parameterization for connection details, source queries,
+and sink configurations.
+"""
+
 from enum import Enum
 import base64
 import os

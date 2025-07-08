@@ -12,19 +12,52 @@ logger: Logger = logging.getLogger(__name__)
 
 class ParquetFileSink(BaseSink):
     """
-    Represents a sink for writing data to a Parquet file.
-    Defines attributes specific to Parquet file sink.
+    Represents a sink for writing data to a Parquet file in a Microsoft Fabric Lakehouse.
+
+    This sink handles writing data to Parquet files stored in a Lakehouse Files area.
+    It automatically resolves workspace and lakehouse names to their corresponding IDs
+    and supports organizing files into directory structures.
+
+    The sink can be configured with specific file details at initialization or these
+    can be provided later through the items parameter in pipeline activities.
 
     Attributes:
-        sink_lakehouse (str): The name or ID of the Lakehouse where the table resides.
-        sink_workspace (str): The name or ID of the workspace containing the Lakehouse.
-        sink_file_name (str): The name of the Parquet file to write data to. i.e "table_name.parquet".
-        sink_directory (str): The directory where the Parquet file will be stored.
+        sink_workspace_id (str): Resolved workspace ID containing the Lakehouse.
+        sink_lakehouse_id (str): Resolved Lakehouse ID where the file will be stored.
+        sink_file_name (Optional[str]): Name of the target Parquet file (e.g., "data.parquet").
+        sink_directory (Optional[str]): Directory path where the file will be stored.
 
-        If you choose to pass the sink_file_name and sink_directory from a list, you can leave these blank, but ensure that the corresponding 'sink_file_name' and 'sink_directory' keys are still present in the list of dictionaries used for pipeline parameters.
-        You may access required parameters using the `required_params` property.
+    Args:
+        sink_lakehouse (str): Name or ID of the target Lakehouse.
+        sink_workspace (str): Name or ID of the workspace containing the Lakehouse.
+        sink_directory (Optional[str]): Directory path. Can be provided later via items.
+        sink_file_name (Optional[str]): Parquet file name. Can be provided later via items.
 
-        The class will resolve Lakehouse and Workspace names to IDs using sempy.fabric.resolve_item and resolve_workspace_id if a name is provided.
+    Raises:
+        ValueError: If workspace or lakehouse cannot be resolved.
+
+    Note:
+        If file details (name, directory) are not provided during initialization,
+        they must be included in the items list when executing pipeline activities.
+        Use the `required_params` property to see which parameters are mandatory.
+
+    Example:
+        ```python
+        # Initialize with all details
+        sink = ParquetFileSink(
+            sink_lakehouse="MyLakehouse",
+            sink_workspace="MyWorkspace",
+            sink_file_name="sales_data.parquet",
+            sink_directory="/exports/sales/"
+        )
+
+        # Initialize for use with items list
+        sink = ParquetFileSink(
+            sink_lakehouse="MyLakehouse",
+            sink_workspace="MyWorkspace"
+        )
+        # File details provided later in copy.items([...])
+        ```
     """
 
     def __init__(
@@ -33,7 +66,6 @@ class ParquetFileSink(BaseSink):
         sink_workspace: str,
         sink_directory: Optional[str] = None,
         sink_file_name: Optional[str] = None,
-        sink_table_action: Optional[str] = None,
     ) -> None:
         super().__init__()
 
@@ -52,7 +84,6 @@ class ParquetFileSink(BaseSink):
 
         self.sink_file_name = sink_file_name
         self.sink_directory = sink_directory
-        self.sink_table_action = sink_table_action
 
         logger.info(
             f"ParquetFileSink initialized: sink_file_name='{sink_file_name}', sink_directory='{sink_directory}'"
@@ -61,15 +92,37 @@ class ParquetFileSink(BaseSink):
     @property
     def required_params(self) -> list[str]:
         """
-        Returns a list of keys that are required parameters for the sink.
-        For ParquetFileSink, these are the file name and directory.
+        Returns the list of required parameter names for this sink type.
+
+        For ParquetFileSink, the required parameters are file name and directory.
+        These must be provided either during initialization or in the items list
+        when executing pipeline activities.
+
+        Returns:
+            list[str]: List of required parameter names:
+                      ["sink_file_name", "sink_directory"]
         """
         return ["sink_file_name", "sink_directory"]
 
     def to_dict(self) -> dict[str, str]:
         """
-        Converts the ParquetFileSink object to a dictionary.
-        Only includes sink_file_name and sink_directory if they are not empty.
+        Converts the ParquetFileSink configuration to a dictionary.
+
+        This method creates a dictionary representation suitable for use in
+        pipeline execution payloads. It includes the resolved workspace and
+        lakehouse IDs, sink type, and any configured file details.
+
+        Returns:
+            dict[str, str]: Dictionary containing:
+                - sink_type: Always "ParquetFile"
+                - sink_lakehouse_id: Resolved Lakehouse ID
+                - sink_workspace_id: Resolved workspace ID
+                - sink_file_name: Parquet file name (if configured)
+                - sink_directory: Directory path (if configured)
+
+        Note:
+            Optional parameters (file_name, directory) are only included if they
+            were provided during initialization.
         """
         result: dict[str, str] = {
             "sink_type": SinkType.PARQUET_FILE.value,

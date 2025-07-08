@@ -1,3 +1,35 @@
+"""
+Microsoft Fabric Lookup Activity builder and executor.
+
+This module provides the Lookup class for building and executing lookup activities
+in Microsoft Fabric data pipelines. Lookup activities are used to retrieve data
+from sources for use in pipeline logic and data transformation operations.
+
+Classes:
+    Lookup: Builder class for creating and executing lookup activities.
+
+The Lookup activity supports both single and batch lookup operations, with
+parameterization support for dynamic queries and flexible source configuration.
+
+Example:
+    ```python
+    from sempy.fabric import FabricRestClient
+    from fabricflow.pipeline.activities import Lookup
+    from fabricflow.pipeline.sources import SQLServerSource
+    from fabricflow.pipeline.templates import LOOKUP_SQL_SERVER
+
+    client = FabricRestClient()
+    source = SQLServerSource(
+        source_connection_id="conn123",
+        source_database_name="AdventureWorks",
+        source_query="SELECT TOP 1 * FROM Sales.Customer"
+    )
+
+    lookup = Lookup(client, "MyWorkspace", LOOKUP_SQL_SERVER)
+    result = lookup.source(source).execute()
+    ```
+"""
+
 from typing import Optional, Any
 from sempy.fabric import FabricRestClient
 
@@ -9,18 +41,60 @@ import json
 
 class Lookup:
     """
-    Builder class for creating lookup activity parameters for Microsoft Fabric Data Pipelines.
+    Builder class for creating and executing lookup activities in Microsoft Fabric pipelines.
 
-    This class enforces the use of prefixed parameter names (e.g., source_*) for clarity and consistency.
-    Supports passing source parameters directly or as a list of dicts (items), as long as all required keys are present.
+    This class provides a fluent interface for configuring lookup activities that retrieve
+    data from various sources. Lookups are commonly used to fetch reference data, validate
+    values, or retrieve configuration parameters needed by other pipeline activities.
+
+    The class supports both single-item and batch lookup operations, with flexible
+    parameterization through the items() method for dynamic query execution.
+
+    Attributes:
+        workspace (str): Target workspace name or ID.
+        pipeline (str): Target pipeline name or ID.
+        client (FabricRestClient): Authenticated Fabric REST client.
+        default_poll_timeout (int): Default timeout for pipeline execution polling.
+        default_poll_interval (int): Default interval between polling attempts.
 
     Args:
-        client (FabricRestClient): The Fabric REST client for API interactions.
-        workspace (str): The name or ID of the Fabric workspace.
-        pipeline (str | DataPipelineTemplates): The name or ID of the pipeline to execute, or a DataPipelineTemplates enum value.
-        default_poll_timeout (int): Default timeout for polling the pipeline execution status.
-        default_poll_interval (int): Default interval for polling the pipeline execution status.
+        client (FabricRestClient): Authenticated Fabric REST client for API interactions.
+        workspace (str): Name or ID of the target Fabric workspace.
+        pipeline (str | DataPipelineTemplates): Name, ID, or template enum of the pipeline.
+        default_poll_timeout (int): Default timeout in seconds for polling execution status.
+        default_poll_interval (int): Default interval in seconds between status checks.
 
+    Example:
+        ```python
+        from sempy.fabric import FabricRestClient
+        from fabricflow.pipeline.activities import Lookup
+        from fabricflow.pipeline.sources import SQLServerSource
+        from fabricflow.pipeline.templates import LOOKUP_SQL_SERVER
+
+        client = FabricRestClient()
+
+        # Create lookup activity
+        lookup = Lookup(
+            client,
+            "MyWorkspace",
+            LOOKUP_SQL_SERVER
+        )
+
+        # Configure source
+        source = SQLServerSource(
+            source_connection_id="conn123",
+            source_database_name="AdventureWorks",
+            source_query="SELECT COUNT(*) as RecordCount FROM Sales.Customer"
+        )
+
+        # Execute lookup
+        result = lookup.source(source).execute()
+        print(f"Lookup result: {result}")
+        ```
+
+    Note:
+        Lookup activities are read-only operations and do not modify data.
+        Use Copy activities for data movement and transformation operations.
     """
 
     def __init__(
@@ -47,35 +121,103 @@ class Lookup:
 
     def source(self, source: BaseSource) -> "Lookup":
         """
-        Sets the source for the lookup activity.
+        Set the data source for the lookup activity.
+
+        Configures the source from which the lookup activity will retrieve data.
+        The source must be a concrete implementation of BaseSource with appropriate
+        connection and query configuration.
+
         Args:
-            source (BaseSource): The source object (with source_*-prefixed params).
+            source (BaseSource): The configured source object containing connection
+                               details and query parameters. Must have all required
+                               parameters set or they will be provided via items().
+
         Returns:
-            Lookup: The builder instance.
+            Lookup: The lookup builder instance for method chaining.
+
+        Example:
+            ```python
+            from fabricflow.pipeline.sources import SQLServerSource
+
+            source = SQLServerSource(
+                source_connection_id="conn123",
+                source_database_name="AdventureWorks",
+                source_query="SELECT TOP 1 CustomerID FROM Sales.Customer"
+            )
+
+            lookup = lookup.source(source)
+            ```
         """
         self._source = source
         return self
 
     def params(self, **kwargs) -> "Lookup":
         """
-        Sets additional parameters for the lookup activity.
+        Set additional parameters for the lookup activity execution.
+
+        Allows setting custom parameters that will be passed to the pipeline
+        execution payload. These parameters can be used for dynamic configuration
+        or to override default values.
+
         Args:
-            **kwargs: Additional parameters to set.
+            **kwargs: Arbitrary keyword arguments to include in the execution payload.
+                     Common parameters include timeout settings, retry policies, etc.
+
         Returns:
-            Lookup: The builder instance.
+            Lookup: The lookup builder instance for method chaining.
+
+        Example:
+            ```python
+            lookup = lookup.params(
+                execution_timeout="00:05:00",
+                retry_count=3,
+                custom_parameter="value"
+            )
+            ```
         """
         self._extra_params.update(kwargs)
         return self
 
     def items(self, items: list[dict]) -> "Lookup":
         """
-        Sets additional parameters for the lookup activity using items.
+        Configure multiple lookup operations using a list of parameter dictionaries.
+
+        This method enables batch lookup operations where each item in the list
+        represents a separate lookup with its own parameters. Useful for scenarios
+        where you need to perform multiple related lookups in a single pipeline run.
+
+        Each item dictionary must contain all required source parameters. The method
+        automatically populates common parameters like query_timeout and isolation_level
+        from the source configuration when not explicitly provided.
+
         Args:
-            items (list): A list of dicts, each containing all required source_* keys.
+            items (list[dict]): List of dictionaries, each containing lookup parameters.
+                              Each dictionary must include all required keys from
+                              the source's required_params property.
+
         Returns:
-            Lookup: The builder instance.
+            Lookup: The lookup builder instance for method chaining.
+
         Raises:
-            ValueError: If any item is missing required keys.
+            ValueError: If source is not set or if any item is missing required keys.
+
+        Example:
+            ```python
+            items = [
+                {
+                    "source_query": "SELECT * FROM Sales.Customer WHERE CustomerID = 1",
+                },
+                {
+                    "source_query": "SELECT * FROM Sales.Customer WHERE CustomerID = 2",
+                }
+            ]
+
+            lookup = lookup.items(items)
+            ```
+
+        Note:
+            Items will inherit query_timeout, isolation_level, and first_row_only
+            settings from the source configuration if not explicitly provided.
         """
 
         if self._source is None:
