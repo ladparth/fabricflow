@@ -1,7 +1,7 @@
 [project]
 name = "fabricflow"
 description = "A code-first approach for MS Fabric data pipelines and ETL."
-version = "0.1.1"
+version = "0.1.2"
 dependencies = ["semantic-link-sempy>=0.8.0"]
 readme = "README.md"
 license = "MIT"
