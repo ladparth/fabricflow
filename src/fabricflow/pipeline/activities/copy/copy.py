@@ -1,3 +1,96 @@
+"""
+Microsoft Fabric Copy Activity builder and executor.
+
+This module provides the Copy class for building and executing copy activities
+in Microsoft Fabric data pipelines. Copy activities are the primary mechanism
+for moving and transforming data between different sources and destinations
+within the Fabric ecosystem.
+
+Classes:
+    Copy: Builder class for creating and executing copy activities with fluent API.
+
+The Copy activity supports a wide range of data movement scenarios including:
+- SQL Server to Lakehouse table transfers
+- SQL Server to Parquet file exports
+- Batch processing with ForEach loops
+- Custom parameterization and data transformation
+- Automatic query timeout and isolation level handling
+
+Key Features:
+- Fluent builder pattern for intuitive configuration
+- Type-safe source and sink configuration
+- Support for both single-item and batch operations
+- Automatic parameter validation and error handling
+- Comprehensive execution monitoring and result extraction
+- Template-based pipeline creation and execution
+
+Data Flow Patterns:
+1. Single Item Copy: One source query → One destination
+2. Batch Copy: Multiple items with ForEach loop processing
+3. Parameterized Copy: Dynamic queries with runtime parameters
+
+Example:
+    ```python
+    from sempy.fabric import FabricRestClient
+    from fabricflow.pipeline.activities import Copy
+    from fabricflow.pipeline.sources import SQLServerSource
+    from fabricflow.pipeline.sinks import LakehouseTableSink
+    from fabricflow.pipeline.templates import DataPipelineTemplates
+
+    client = FabricRestClient()
+
+    # Create source and sink
+    source = SQLServerSource(
+        source_connection_id="sql-conn-123",
+        source_database_name="AdventureWorks",
+        source_query="SELECT * FROM Sales.Customer"
+    )
+
+    sink = LakehouseTableSink(
+        sink_workspace="analytics-workspace",
+        sink_lakehouse="sales-lakehouse",
+        sink_table_name="customers",
+        sink_schema_name="dbo",
+        sink_table_action="Overwrite"
+    )
+
+    # Execute single copy operation
+    copy = Copy(client, "MyWorkspace", DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE)
+    result = copy.source(source).sink(sink).execute()
+
+    # Execute batch copy operation
+    items = [
+        {
+            "source_query": "SELECT * FROM Sales.Customer",
+            "sink_table_name": "customers",
+            "sink_schema_name": "sales",
+            "sink_table_action": "Overwrite"
+        },
+        {
+            "source_query": "SELECT * FROM Sales.SalesOrderHeader",
+            "sink_table_name": "orders",
+            "sink_schema_name": "sales",
+            "sink_table_action": "Append"
+        }
+    ]
+
+    batch_copy = Copy(client, "MyWorkspace", DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH)
+    result = batch_copy.source(source).sink(sink).items(items).execute()
+    ```
+
+Performance Considerations:
+- Use batch operations for multiple related copies to reduce overhead
+- Configure appropriate query timeouts for large data transfers
+- Consider isolation levels impact on source database performance
+- Monitor pipeline execution for optimization opportunities
+
+Dependencies:
+- sempy.fabric: For FabricRestClient integration
+- fabricflow.pipeline.templates: For pipeline template definitions
+- fabricflow.pipeline.sources: For source configuration
+- fabricflow.pipeline.sinks: For sink configuration
+"""
+
 from typing import Optional, Any
 from sempy.fabric import FabricRestClient
 
@@ -10,18 +103,107 @@ import json
 
 class Copy:
     """
-    Builder class for creating copy activity parameters for Microsoft Fabric Data Pipelines.
+    Builder class for creating and executing copy activities in Microsoft Fabric data pipelines.
 
-    This class enforces the use of prefixed parameter names (e.g., source_*, sink_*) for clarity and consistency.
-    Supports passing source and sink parameters directly or as a list of dicts (items), as long as all required keys are present.
+    This class provides a fluent interface for configuring copy operations that move data
+    between various sources and destinations within Microsoft Fabric. It supports both
+    single-item and batch copy operations with comprehensive parameter validation and
+    execution monitoring.
+
+    The Copy class uses a builder pattern where you configure the source, sink, and
+    optional parameters through method chaining, then execute the copy operation.
+    It automatically handles parameter validation, payload construction, and pipeline
+    execution with proper error handling.
+
+    Key Features:
+    - Fluent builder API for intuitive configuration
+    - Support for single and batch copy operations
+    - Automatic parameter validation and error handling
+    - Template-based pipeline execution
+    - Query timeout and isolation level management
+    - Comprehensive execution monitoring and result extraction
+
+    Attributes:
+        workspace (str): Target workspace name or ID.
+        pipeline (str): Target pipeline name or ID (resolved from template if provided).
+        client (FabricRestClient): Authenticated Fabric REST client.
+        default_poll_timeout (int): Default timeout for pipeline execution polling.
+        default_poll_interval (int): Default interval between polling attempts.
 
     Args:
-        client (FabricRestClient): The Fabric REST client for API interactions.
-        workspace (str): The name or ID of the Fabric workspace.
-        pipeline (str | DataPipelineTemplates): The name or ID of the pipeline to execute, or a DataPipelineTemplates enum value.
-        default_poll_timeout (int): Default timeout for polling the pipeline execution status.
-        default_poll_interval (int): Default interval for polling the pipeline execution status.
+        client (FabricRestClient): Authenticated Fabric REST client for API interactions.
+        workspace (str): Name or ID of the target Fabric workspace.
+        pipeline (str | DataPipelineTemplates): Pipeline name, ID, or template enum.
+                                               If DataPipelineTemplates enum is provided,
+                                               the template value will be used as pipeline name.
+        default_poll_timeout (int): Default timeout in seconds for polling execution status.
+                                   Defaults to 300 seconds (5 minutes).
+        default_poll_interval (int): Default interval in seconds between status checks.
+                                    Defaults to 15 seconds.
 
+    Raises:
+        TypeError: If client is not a FabricRestClient instance.
+        ValueError: If workspace or pipeline cannot be resolved.
+
+    Example:
+        ```python
+        from sempy.fabric import FabricRestClient
+        from fabricflow.pipeline.activities import Copy
+        from fabricflow.pipeline.sources import SQLServerSource
+        from fabricflow.pipeline.sinks import LakehouseTableSink
+        from fabricflow.pipeline.templates import DataPipelineTemplates
+
+        client = FabricRestClient()
+
+        # Configure source and sink
+        source = SQLServerSource(
+            source_connection_id="sql-conn-123",
+            source_database_name="AdventureWorks",
+            source_query="SELECT * FROM Sales.Customer WHERE ModifiedDate > '2023-01-01'"
+        )
+
+        sink = LakehouseTableSink(
+            sink_workspace="analytics-workspace",
+            sink_lakehouse="sales-lakehouse",
+            sink_table_name="customers",
+            sink_schema_name="dbo",
+            sink_table_action="Overwrite"
+        )
+
+        # Execute copy operation
+        copy = Copy(
+            client,
+            "MyWorkspace",
+            DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE
+        )
+
+        result = copy.source(source).sink(sink).execute()
+        print(f"Copy completed with status: {result['status']}")
+
+        # For batch operations
+        items = [
+            {
+                "source_query": "SELECT * FROM Sales.Customer",
+                "sink_table_name": "customers",
+                "sink_schema_name": "sales",
+                "sink_table_action": "Overwrite"
+            },
+            {
+                "source_query": "SELECT * FROM Sales.SalesOrderHeader",
+                "sink_table_name": "orders",
+                "sink_schema_name": "sales",
+                "sink_table_action": "Append"
+            }
+        ]
+
+        batch_result = copy.items(items).execute()
+        ```
+
+    Note:
+        - Both source and sink must be configured before calling execute()
+        - For batch operations, use items() to provide multiple copy configurations
+        - Query timeout and isolation level are automatically managed from source configuration
+        - The class maintains backward compatibility with the previous CopyManager name
     """
 
     def __init__(

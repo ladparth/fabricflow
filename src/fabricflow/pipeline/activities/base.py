@@ -1,3 +1,76 @@
+"""
+Base classes and abstractions for Microsoft Fabric data pipeline activities.
+
+This module provides the foundational abstract base class for all activity-specific
+pipeline executors in Microsoft Fabric. Activity executors handle the execution
+and monitoring of specific activity types within data pipelines, such as Copy
+activities, Lookup activities, and other data processing operations.
+
+Classes:
+    BaseActivityExecutor: Abstract base class for activity-specific pipeline executors.
+
+The BaseActivityExecutor extends the core DataPipelineExecutor with activity-specific
+functionality, including automatic filtering for specific activity types, standardized
+result processing, and extensible hooks for activity-specific customizations.
+
+Key Features:
+- Activity-type filtering for targeted result extraction
+- Standardized execution workflow for all activity types
+- Extensible design with processing hooks for subclasses
+- Comprehensive error handling and logging
+- Type-safe interface with proper abstractions
+
+Activity Execution Workflow:
+1. Initialize executor with activity-specific configuration
+2. Execute pipeline with automatic activity type filtering
+3. Process activity-specific results through hooks
+4. Return standardized result format with execution details
+
+Example:
+    ```python
+    # Subclass implementation for Copy activities
+    class CopyActivityExecutor(BaseActivityExecutor):
+        def get_activity_type(self) -> str:
+            return "Copy"
+
+        def process_activity_results(self, result: dict[str, Any]) -> dict[str, Any]:
+            # Copy-specific result processing
+            if "activity_results" in result:
+                for activity in result["activity_results"]:
+                    if activity.get("activityType") == "Copy":
+                        # Process copy-specific metrics
+                        activity["processed"] = True
+            return result
+
+    # Usage
+    executor = CopyActivityExecutor(
+        client=fabric_client,
+        workspace="MyWorkspace",
+        pipeline="CopyPipeline",
+        payload=copy_payload
+    )
+
+    result = executor.run()
+    print(f"Copy activity completed: {result['status']}")
+    ```
+
+Architecture Benefits:
+- Consistent interface across all activity types
+- Automatic activity filtering reduces result noise
+- Extensible design supports new activity types
+- Comprehensive logging for debugging and monitoring
+- Error handling with proper exception chaining
+
+Dependencies:
+- sempy.fabric: For FabricRestClient integration
+- fabricflow.pipeline.executor: For base DataPipelineExecutor functionality
+
+Note:
+    This is an abstract base class and cannot be instantiated directly.
+    Concrete implementations must implement the get_activity_type() method
+    and optionally override process_activity_results() for custom processing.
+"""
+
 from typing import Optional, List, Dict, Any
 import logging
 from logging import Logger
@@ -10,12 +83,100 @@ logger: Logger = logging.getLogger(__name__)
 
 class BaseActivityExecutor(DataPipelineExecutor, ABC):
     """
-    Base class for activity-specific pipeline executors.
+    Abstract base class for activity-specific pipeline executors in Microsoft Fabric.
 
-    This class provides common functionality for activity-specific executors:
-    - Automatic filtering for specific activity types
-    - Template for activity-specific workflow execution
-    - Extensible design for future customizations
+    This class extends DataPipelineExecutor to provide specialized functionality for
+    executing and monitoring specific types of activities within data pipelines.
+    It automatically handles activity type filtering, standardizes the execution
+    workflow, and provides hooks for activity-specific result processing.
+
+    The BaseActivityExecutor serves as the foundation for all concrete activity
+    executors (Copy, Lookup, etc.), ensuring consistent behavior and interfaces
+    across different activity types while allowing for specialized customization.
+
+    Key Features:
+    - Automatic activity type filtering for targeted result extraction
+    - Standardized execution workflow with error handling
+    - Extensible design with processing hooks for subclasses
+    - Comprehensive logging throughout the execution lifecycle
+    - Type-safe interface with proper abstractions
+
+    Workflow:
+    1. Initialize with activity-specific configuration and payload
+    2. Execute pipeline with automatic activity filtering applied
+    3. Process results through activity-specific hooks if overridden
+    4. Return standardized result format with execution details
+
+    Attributes:
+        Inherits all attributes from DataPipelineExecutor including:
+        - client: FabricRestClient for API interactions
+        - workspace_id: Resolved workspace identifier
+        - pipeline_id: Resolved pipeline identifier
+        - payload: Execution payload with parameters
+        - default_poll_timeout: Timeout for polling operations
+        - default_poll_interval: Interval between status checks
+
+    Abstract Methods:
+        get_activity_type(): Must return the activity type name for filtering.
+
+    Virtual Methods:
+        process_activity_results(): Override for activity-specific result processing.
+
+    Args:
+        client (FabricRestClient): Authenticated Fabric REST client for API interactions.
+        workspace (str): Name or ID of the target Fabric workspace.
+        pipeline (str): Name or ID of the pipeline to execute.
+        payload (Dict[str, Any]): JSON payload containing execution parameters.
+        default_poll_timeout (int): Default timeout in seconds for polling operations.
+                                   Defaults to 300 seconds (5 minutes).
+        default_poll_interval (int): Default interval in seconds between status checks.
+                                    Defaults to 15 seconds.
+
+    Raises:
+        TypeError: If client is not a FabricRestClient instance.
+        ValueError: If workspace or pipeline cannot be resolved.
+        DataPipelineError: If pipeline execution fails.
+
+    Example:
+        ```python
+        # Concrete implementation
+        class CopyActivityExecutor(BaseActivityExecutor):
+            def get_activity_type(self) -> str:
+                return "Copy"
+
+            def process_activity_results(self, result: dict[str, Any]) -> dict[str, Any]:
+                # Add copy-specific processing
+                copy_activities = [
+                    activity for activity in result.get("activity_results", [])
+                    if activity.get("activityType") == "Copy"
+                ]
+                result["copy_activity_count"] = len(copy_activities)
+                return result
+
+        # Usage
+        copy_executor = CopyActivityExecutor(
+            client=fabric_client,
+            workspace="analytics-workspace",
+            pipeline="copy-pipeline",
+            payload={
+                "executionData": {
+                    "parameters": {
+                        "source_query": "SELECT * FROM customers",
+                        "sink_table_name": "customer_data"
+                    }
+                }
+            }
+        )
+
+        result = copy_executor.run()
+        print(f"Execution status: {result['status']}")
+        print(f"Copy activities: {result.get('copy_activity_count', 0)}")
+        ```
+
+    Note:
+        This is an abstract base class that cannot be instantiated directly.
+        Subclasses must implement get_activity_type() and optionally override
+        process_activity_results() for specialized behavior.
     """
 
     def __init__(

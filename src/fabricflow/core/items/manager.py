@@ -1,3 +1,90 @@
+"""
+Microsoft Fabric core items management via REST API.
+
+This module provides the FabricCoreItemsManager class for comprehensive management
+of Microsoft Fabric items within workspaces. It implements CRUD (Create, Read, Update, Delete)
+operations for all supported Fabric item types including Lakehouses, Data Pipelines,
+Reports, Semantic Models, and many others.
+
+Classes:
+    FabricCoreItemsManager: Complete item management with REST API integration.
+
+The FabricCoreItemsManager provides a unified interface for managing all types of
+Microsoft Fabric items within a workspace. It abstracts the REST API complexity
+and provides type-safe operations with comprehensive error handling.
+
+Supported Item Types:
+    All item types defined in FabricItemType enum are supported, including:
+    - Data Storage: Lakehouses, Warehouses, SQL Databases
+    - Analytics: Reports, Dashboards, Semantic Models  
+    - Data Processing: Data Pipelines, Dataflows, Notebooks
+    - Real-time: Eventstreams, Eventhouses, KQL components
+    - Machine Learning: ML Models, ML Experiments
+    - Development: Environments, Spark Job Definitions
+    - And many more...
+
+Key Features:
+    - Unified CRUD operations for all Fabric item types
+    - Automatic workspace resolution (name or ID)
+    - Type-safe item creation with FabricItemType enum
+    - Paginated listing support for large item collections
+    - Comprehensive error handling and validation
+    - Support for item definitions and metadata
+
+Item Lifecycle:
+    1. Create item with display name, type, and optional definition
+    2. Retrieve item details by ID
+    3. Update item properties and metadata
+    4. List and filter items in workspace
+    5. Delete item when no longer needed
+
+Example:
+    ```python
+    from sempy.fabric import FabricRestClient
+    from fabricflow.core.items.manager import FabricCoreItemsManager
+    from fabricflow.core.items.types import FabricItemType
+    
+    client = FabricRestClient()
+    manager = FabricCoreItemsManager(client, "MyWorkspace")
+    
+    # Create a new Lakehouse
+    lakehouse = manager.create_item(
+        display_name="Sales Data Lakehouse",
+        item_type=FabricItemType.LAKEHOUSE
+    )
+    
+    # Create a data pipeline with definition
+    pipeline = manager.create_item(
+        display_name="ETL Pipeline",
+        item_type=FabricItemType.DATA_PIPELINE,
+        definition=pipeline_definition
+    )
+    
+    # List all items in workspace
+    items = manager.list_items(paged=True)
+    
+    # Get specific item details
+    item_details = manager.get_item(lakehouse['id'])
+    
+    # Update item description
+    manager.update_item(lakehouse['id'], {
+        'description': 'Updated lakehouse for sales analytics'
+    })
+    
+    # Delete item
+    manager.delete_item(pipeline['id'])
+    ```
+
+Security Note:
+    All operations require appropriate Microsoft Fabric permissions for the target
+    workspace. Item deletion is permanent and cannot be undone.
+    
+Dependencies:
+    - sempy.fabric: For FabricRestClient integration
+    - fabricflow.core.workspaces.utils: For workspace ID resolution
+    - fabricflow.core.items.types: For FabricItemType definitions
+"""
+
 from typing import Optional, Dict, Any
 from sempy.fabric import FabricRestClient
 from ..workspaces.utils import get_workspace_id
