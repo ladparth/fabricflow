@@ -1,3 +1,68 @@
+"""
+Microsoft Fabric workspaces management via REST API.
+
+This module provides the FabricWorkspacesManager class for comprehensive workspace
+management in Microsoft Fabric. It implements CRUD (Create, Read, Update, Delete)
+operations for workspaces and capacity assignment functionality.
+
+Classes:
+    FabricWorkspacesManager: Complete workspace management with REST API integration.
+
+The FabricWorkspacesManager provides a high-level interface for all workspace-related
+operations in Microsoft Fabric, including creating new workspaces, retrieving workspace
+details, updating workspace properties, deleting workspaces, and assigning workspaces
+to specific capacities.
+
+Key Features:
+    - Workspace CRUD operations with proper error handling
+    - Automatic workspace and capacity name-to-ID resolution
+    - Capacity assignment with validation
+    - Paginated listing support for large workspace collections
+    - Type-safe interfaces with comprehensive documentation
+
+Workspace Lifecycle:
+    1. Create workspace with optional description
+    2. Assign to capacity for compute resources
+    3. Manage workspace properties and settings
+    4. List and filter workspaces
+    5. Delete when no longer needed (permanent operation)
+
+Example:
+    ```python
+    from sempy.fabric import FabricRestClient
+    from fabricflow.core.workspaces.manager import FabricWorkspacesManager
+    
+    client = FabricRestClient()
+    manager = FabricWorkspacesManager(client)
+    
+    # Create a new workspace
+    workspace = manager.create_workspace(
+        display_name="Data Analytics Workspace",
+        description="Workspace for sales analytics and reporting"
+    )
+    
+    # Assign to a capacity
+    manager.assign_to_capacity("Data Analytics Workspace", "Premium Capacity")
+    
+    # List all workspaces
+    workspaces = manager.list_workspaces(paged=True)
+    
+    # Update workspace description
+    manager.update_workspace(workspace['id'], {
+        'description': 'Updated workspace description'
+    })
+    ```
+
+Security Note:
+    All operations require appropriate Microsoft Fabric permissions. Workspace
+    deletion is a permanent operation that cannot be undone - use with caution.
+    
+Dependencies:
+    - sempy.fabric: For FabricRestClient and workspace resolution
+    - fabricflow.core.capacities: For capacity ID resolution
+    - fabricflow.core.workspaces.utils: For workspace utilities
+"""
+
 from typing import Optional, Dict, Any, List
 from sempy.fabric import FabricRestClient
 from .utils import get_workspace_id
@@ -87,10 +152,23 @@ class FabricWorkspacesManager:
 
     def delete_workspace(self, workspace_id: str) -> None:
         """
-        Delete a workspace by its ID.
+        Delete an existing workspace.
+
+        Permanently removes a workspace and all its contents from Microsoft Fabric.
+        This operation cannot be undone.
 
         Args:
-            workspace_id (str): The ID of the workspace to delete.
+            workspace_id (str): The unique identifier of the workspace to delete.
+
+        Returns:
+            None
+
+        Raises:
+            HTTPError: If the workspace doesn't exist or the user lacks permissions.
+            
+        Warning:
+            This operation permanently deletes the workspace and all its contents
+            including items, data, and configurations. Use with caution.
         """
         url: str = f"/v1/workspaces/{workspace_id}"
         response = self.client.delete(url)
@@ -120,12 +198,29 @@ class FabricWorkspacesManager:
         """
         Assign the specified workspace to the specified capacity.
 
+        This method assigns a Microsoft Fabric workspace to a specific capacity,
+        which determines the compute resources and pricing tier for the workspace.
+        Both workspace and capacity can be specified by name or ID.
+
         Args:
             workspace (str): The ID or name of the workspace to assign.
+                If a name is provided, it will be resolved to an ID automatically.
             capacity (str): The ID or name of the capacity to assign the workspace to.
+                If a name is provided, it will be resolved to an ID automatically.
+
+        Returns:
+            str: A success message indicating the workspace was assigned to the capacity.
 
         Raises:
-            HTTPError: If the request fails.
+            ValueError: If the capacity name/ID cannot be resolved to a valid capacity.
+            HTTPError: If the assignment request fails (e.g., insufficient permissions,
+                invalid workspace/capacity, or capacity at full utilization).
+
+        Example:
+            >>> manager = FabricWorkspacesManager(client)
+            >>> result = manager.assign_to_capacity("my-workspace", "my-capacity")
+            >>> print(result)
+            "Workspace 'my-workspace' assigned to capacity 'my-capacity' successfully."
         """
         workspace_id: str = get_workspace_id(workspace)
         capacity_id: str | None = resolve_capacity_id(self.client, capacity)

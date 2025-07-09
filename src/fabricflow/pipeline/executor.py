@@ -1,3 +1,19 @@
+"""
+Microsoft Fabric Data Pipeline execution and monitoring.
+
+This module provides classes and utilities for executing and monitoring
+data pipelines in Microsoft Fabric. It handles pipeline triggering,
+status polling, and result extraction.
+
+Classes:
+    DataPipelineExecutor: Main class for executing and monitoring data pipelines.
+    PipelineStatus: Enum defining possible pipeline execution statuses.
+    DataPipelineError: Custom exception for pipeline-related errors.
+
+The module supports both synchronous and asynchronous pipeline execution
+patterns with configurable timeout and polling intervals.
+"""
+
 from datetime import timedelta, datetime
 import time
 import logging
@@ -13,17 +29,38 @@ logger: Logger = logging.getLogger(__name__)
 
 
 class PipelineStatus(Enum):
-    """Enum for pipeline statuses - makes code more readable and prevents typos"""
+    """Enumeration of possible Microsoft Fabric pipeline execution statuses.
+    
+    This enum provides type-safe constants for pipeline statuses, making code
+    more readable and preventing typos when checking pipeline execution state.
+    
+    Attributes:
+        COMPLETED: Pipeline execution finished successfully.
+        FAILED: Pipeline execution failed with an error.
+        CANCELLED: Pipeline execution was cancelled by user or system.
+        RUNNING: Pipeline is currently executing.
+        PENDING: Pipeline is queued for execution.
+    """
 
     COMPLETED = "Completed"
-    FAILED = "Failed"
+    FAILED = "Failed" 
     CANCELLED = "Cancelled"
     RUNNING = "Running"
     PENDING = "Pending"
 
 
 class DataPipelineError(Exception):
-    """Custom exception for pipeline-related errors"""
+    """Custom exception for pipeline-related errors.
+    
+    This exception is raised when pipeline operations fail, such as:
+    - Failed to trigger pipeline execution
+    - Pipeline execution errors or timeouts
+    - Invalid pipeline configurations
+    - API communication errors during pipeline operations
+    
+    The exception typically wraps the underlying error while providing
+    additional context about the pipeline operation that failed.
+    """
 
     pass
 
@@ -32,10 +69,39 @@ class DataPipelineExecutor:
     """
     A client for managing Microsoft Fabric data pipeline executions.
 
-    This class handles:
-    - Triggering pipeline jobs
-    - Polling for completion status
-    - Querying activity run results
+    This class provides a high-level interface for executing and monitoring 
+    data pipelines in Microsoft Fabric. It handles the complete pipeline
+    execution lifecycle including triggering, status polling, and result
+    extraction.
+
+    Key capabilities:
+    - Trigger pipeline execution with custom parameters
+    - Poll for completion status with configurable timeouts
+    - Query and filter activity run results
+    - Handle pipeline errors and timeouts gracefully
+
+    The executor automatically resolves workspace and pipeline names to IDs
+    and provides detailed logging throughout the execution process.
+
+    Attributes:
+        client (FabricRestClient): Authenticated Fabric REST client.
+        workspace_id (str): Resolved workspace ID.
+        pipeline_id (str): Resolved pipeline ID.
+        payload (Dict[str, Any]): Execution parameters payload.
+        default_poll_timeout (int): Default timeout for polling operations.
+        default_poll_interval (int): Default interval between status checks.
+
+    Example:
+        >>> from sempy.fabric import FabricRestClient
+        >>> client = FabricRestClient()
+        >>> executor = DataPipelineExecutor(
+        ...     client=client,
+        ...     workspace="my-workspace",
+        ...     pipeline="my-pipeline", 
+        ...     payload={"executionData": {"parameters": {}}}
+        ... )
+        >>> result = executor.run()
+        >>> print(f"Pipeline status: {result['status']}")
     """
 
     def __init__(

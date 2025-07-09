@@ -1,3 +1,25 @@
+"""
+Microsoft Fabric Data Pipeline Templates.
+
+This module provides pre-built pipeline templates for common data integration
+scenarios in Microsoft Fabric. Templates are stored as JSON files and can be
+used to quickly create data pipelines for specific source-to-sink patterns.
+
+Classes:
+    DataPipelineTemplates: Enum containing all available pipeline templates.
+
+Functions:
+    get_template: Retrieve a template definition ready for Fabric API.
+    get_base64_str: Utility function to encode template files as base64.
+
+Template Categories:
+    - Copy Activities: SQL Server to Lakehouse/Parquet with single or batch processing
+    - Lookup Activities: SQL Server lookup operations with optional ForEach loops
+
+All templates support parameterization for connection details, source queries,
+and sink configurations.
+"""
+
 from enum import Enum
 import base64
 import os
@@ -14,6 +36,23 @@ class DataPipelineTemplates(Enum):
     COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH = "CopySQLServerToLakehouseTableForEach"
     COPY_SQL_SERVER_TO_PARQUET_FILE = "CopySQLServerToParquetFile"
     COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH = "CopySQLServerToParquetFileForEach"
+    LOOKUP_SQL_SERVER = "LookupSQLServer"
+    LOOKUP_SQL_SERVER_FOR_EACH = "LookupSQLServerForEach"
+
+
+# Exporting the templates individually for convenience
+COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE = (
+    DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE
+)
+COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH = (
+    DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH
+)
+COPY_SQL_SERVER_TO_PARQUET_FILE = DataPipelineTemplates.COPY_SQL_SERVER_TO_PARQUET_FILE
+COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH = (
+    DataPipelineTemplates.COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH
+)
+LOOKUP_SQL_SERVER = DataPipelineTemplates.LOOKUP_SQL_SERVER
+LOOKUP_SQL_SERVER_FOR_EACH = DataPipelineTemplates.LOOKUP_SQL_SERVER_FOR_EACH
 
 
 def get_base64_str(file_path: str) -> str:
@@ -48,7 +87,7 @@ def get_template(template: DataPipelineTemplates) -> dict:
     Raises:
         FileNotFoundError: If the template file does not exist.
     """
-    template_dir: str = os.path.join(os.path.dirname(__file__), "templates")
+    template_dir: str = os.path.join(os.path.dirname(__file__), "definitions")
     template_path: str = os.path.join(template_dir, f"{template.value}.json")
 
     base64_str: str = get_base64_str(template_path)
@@ -64,22 +103,3 @@ def get_template(template: DataPipelineTemplates) -> dict:
             ]
         }
     }
-
-
-# Example usage:
-# if __name__ == "__main__":
-#     from typing import Literal
-#     template: Literal[DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE] = (
-#         DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE
-#     )
-#     try:
-#         template_definition: dict = get_template(template)
-#         print(template_definition)
-#     except FileNotFoundError as e:
-#         print(e)
-#         print(
-#             {
-#                 "template": template.value,
-#                 "parameters": {},
-#             }
-#         )

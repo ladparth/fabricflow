@@ -32,7 +32,14 @@
                     "value": "@item().source_query",
                     "type": "Expression"
                   },
-                  "queryTimeout": "02:00:00",
+                  "queryTimeout": {
+                    "value": "@item().query_timeout",
+                    "type": "Expression"
+                  },
+                  "isolationLevel": {
+                    "value": "@item().isolation_level",
+                    "type": "Expression"
+                  },
                   "partitionOption": "None",
                   "datasetSettings": {
                     "annotations": [],
