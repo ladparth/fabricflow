@@ -14,7 +14,9 @@ Functions:
 
 Template Categories:
     - Copy Activities: SQL Server to Lakehouse/Parquet with single or batch processing
+    - Copy Activities: Google BigQuery to Lakehouse/Parquet with single processing
     - Lookup Activities: SQL Server lookup operations with optional ForEach loops
+    - Lookup Activities: Google BigQuery lookup operations with optional ForEach loops
 
 All templates support parameterization for connection details, source queries,
 and sink configurations.
@@ -36,8 +38,12 @@ class DataPipelineTemplates(Enum):
     COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH = "CopySQLServerToLakehouseTableForEach"
     COPY_SQL_SERVER_TO_PARQUET_FILE = "CopySQLServerToParquetFile"
     COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH = "CopySQLServerToParquetFileForEach"
+    COPY_GOOGLE_BIGQUERY_TO_LAKEHOUSE_TABLE = "CopyGoogleBigQueryToLakehouseTable"
+    COPY_GOOGLE_BIGQUERY_TO_PARQUET_FILE = "CopyGoogleBigQueryToParquetFile"
+
     LOOKUP_SQL_SERVER = "LookupSQLServer"
     LOOKUP_SQL_SERVER_FOR_EACH = "LookupSQLServerForEach"
+    LOOKUP_GOOGLE_BIGQUERY = "LookupGoogleBigQuery"
 
 
 # Exporting the templates individually for convenience
@@ -51,8 +57,17 @@ COPY_SQL_SERVER_TO_PARQUET_FILE = DataPipelineTemplates.COPY_SQL_SERVER_TO_PARQU
 COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH = (
     DataPipelineTemplates.COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH
 )
+COPY_GOOGLE_BIGQUERY_TO_LAKEHOUSE_TABLE = (
+    DataPipelineTemplates.COPY_GOOGLE_BIGQUERY_TO_LAKEHOUSE_TABLE
+)
+COPY_GOOGLE_BIGQUERY_TO_PARQUET_FILE = (
+    DataPipelineTemplates.COPY_GOOGLE_BIGQUERY_TO_PARQUET_FILE
+)
+
+# Lookup templates
 LOOKUP_SQL_SERVER = DataPipelineTemplates.LOOKUP_SQL_SERVER
 LOOKUP_SQL_SERVER_FOR_EACH = DataPipelineTemplates.LOOKUP_SQL_SERVER_FOR_EACH
+LOOKUP_GOOGLE_BIGQUERY = DataPipelineTemplates.LOOKUP_GOOGLE_BIGQUERY
 
 
 def get_base64_str(file_path: str) -> str:

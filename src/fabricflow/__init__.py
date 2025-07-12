@@ -68,7 +68,12 @@ from .pipeline.utils import create_data_pipeline
 
 # Pipeline sources and sinks
 from .pipeline.sinks import LakehouseTableSink, ParquetFileSink, BaseSink, SinkType
-from .pipeline.sources import BaseSource, SQLServerSource, SourceType
+from .pipeline.sources import (
+    BaseSource,
+    SQLServerSource,
+    SourceType,
+    GoogleBigQuerySource,
+)
 
 # Core items and workspaces
 from .core.items.manager import FabricCoreItemsManager
@@ -108,6 +113,7 @@ __all__: list[str] = [
     "BaseSource",
     "SQLServerSource",
     "SourceType",
+    "GoogleBigQuerySource",
     # Core items and workspaces
     "FabricCoreItemsManager",
     "FabricItemType",
