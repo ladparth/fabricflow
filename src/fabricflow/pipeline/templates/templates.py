@@ -42,6 +42,7 @@ class DataPipelineTemplates(Enum):
     COPY_GOOGLE_BIGQUERY_TO_PARQUET_FILE = "CopyGoogleBigQueryToParquetFile"
     COPY_POSTGRESQL_TO_LAKEHOUSE_TABLE = "CopyPostgreSQLToLakehouseTable"
     COPY_POSTGRESQL_TO_PARQUET_FILE = "CopyPostgreSQLToParquetFile"
+    COPY_FILES_TO_LAKEHOUSE = "CopyFilesToLakehouse"
     LOOKUP_SQL_SERVER = "LookupSQLServer"
     LOOKUP_SQL_SERVER_FOR_EACH = "LookupSQLServerForEach"
     LOOKUP_GOOGLE_BIGQUERY = "LookupGoogleBigQuery"
@@ -69,6 +70,7 @@ COPY_POSTGRESQL_TO_LAKEHOUSE_TABLE = (
     DataPipelineTemplates.COPY_POSTGRESQL_TO_LAKEHOUSE_TABLE
 )
 COPY_POSTGRESQL_TO_PARQUET_FILE = DataPipelineTemplates.COPY_POSTGRESQL_TO_PARQUET_FILE
+COPY_FILES_TO_LAKEHOUSE = DataPipelineTemplates.COPY_FILES_TO_LAKEHOUSE
 
 # Lookup templates
 LOOKUP_SQL_SERVER = DataPipelineTemplates.LOOKUP_SQL_SERVER
