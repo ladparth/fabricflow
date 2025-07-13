@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2025-07-13
+
+### Added
+
+- **Google BigQuery Data Source**: New `GoogleBigQuerySource` class with connection, query execution, and batch operation support
+- **PostgreSQL Data Source**: New `PostgreSQLSource` class with connection management, query timeouts, and comprehensive parameter validation
+- **Extended Pipeline Templates**: Added BigQuery and PostgreSQL templates for copy and lookup operations
+  - `CopyGoogleBigQueryToLakehouseTable.json` - Copy data from BigQuery to Lakehouse tables
+  - `CopyGoogleBigQueryToParquetFile.json` - Copy data from BigQuery to Parquet files
+  - `CopyPostgreSQLToLakehouseTable.json` - Copy data from PostgreSQL to Lakehouse tables
+  - `CopyPostgreSQLToParquetFile.json` - Copy data from PostgreSQL to Parquet files
+  - `LookupGoogleBigQuery.json` - Lookup operations with BigQuery
+  - `LookupPostgreSQL.json` - Lookup operations with PostgreSQL
+- **Enhanced Source Types**: Added `GOOGLE_BIGQUERY` and `POSTGRESQL` to `SourceType` enum
+- **First Row Only Support**: Added `first_row_only` parameter to BigQuery and PostgreSQL sources for lookup operations
+
+### Fixed
+
+- **Template Parameter Mapping**: Fixed `sink_schema_name` and `sink_table_name` parameter assignments in pipeline templates
+- **Template Cleanup**: Removed deprecated metadata fields (`lastModifiedByObjectId`, `lastPublishTime`, `dependsOn`) from all template definitions
+
+### Changed
+
+- **Service Principal Documentation**: Added note about workspace and connection access requirements for Service Principal authentication in README
+
 ## [0.1.2] - 2025-07-08
 
 ### Added
