@@ -116,9 +116,6 @@
       "items": { "type": "array" },
       "sink_workspace_id": { "type": "string" },
       "sink_lakehouse_id": { "type": "string" }
-    },
-    "lastModifiedByObjectId": "f21bfa33-f194-4082-bf1a-48147398c081",
-    "lastPublishTime": "2025-06-27T01:39:40Z"
-  },
-  "dependsOn": []
+    }
+  }
 }
