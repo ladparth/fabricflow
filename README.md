@@ -40,7 +40,7 @@ Below is a sample workflow that demonstrates how to use FabricFlow to automate w
 from sempy.fabric import FabricRestClient
 from fabricflow import create_workspace, create_data_pipeline
 from fabricflow.pipeline.activities import Copy, Lookup
-from fabricflow.pipeline.sources import SQLServerSource
+from fabricflow.pipeline.sources import SQLServerSource, GoogleBigQuerySource, PostgreSQLSource
 from fabricflow.pipeline.sinks import LakehouseTableSink, ParquetFileSink
 from fabricflow.pipeline.templates import (
     DataPipelineTemplates,
@@ -254,6 +254,8 @@ Below are the main classes and functions available in FabricFlow:
 ### Sources and Sinks
 
 - `SQLServerSource` – Define SQL Server as a data source.
+- `GoogleBigQuerySource` – Define Google BigQuery as a data source.
+- `PostgreSQLSource` – Define PostgreSQL as a data source.
 - `BaseSource` – Base class for all data sources.
 - `LakehouseTableSink` – Define a Lakehouse table as a data sink.
 - `ParquetFileSink` – Define a Parquet file as a data sink.
@@ -282,7 +284,7 @@ Below are the main classes and functions available in FabricFlow:
 FabricFlow provides a modular architecture with separate packages for activities, sources, sinks, and templates:
 
 - **Activities**: `Copy`, `Lookup` - Build and execute pipeline activities
-- **Sources**: `SQLServerSource`, `BaseSource`, `SourceType` - Define data sources
+- **Sources**: `SQLServerSource`, `GoogleBigQuerySource`, `PostgreSQLSource`, `BaseSource`, `SourceType` - Define data sources
 - **Sinks**: `LakehouseTableSink`, `ParquetFileSink`, `BaseSink`, `SinkType` - Define data destinations
 - **Templates**: Pre-built pipeline definitions for common patterns
 
