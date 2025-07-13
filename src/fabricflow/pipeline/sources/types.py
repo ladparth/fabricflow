@@ -46,6 +46,8 @@ class SourceType(Enum):
     """
 
     SQL_SERVER = "SQLServer"
+    GOOGLE_BIGQUERY = "GoogleBigQuery"
+    POSTGRESQL = "PostgreSQL"
 
 
 class IsolationLevel(Enum):

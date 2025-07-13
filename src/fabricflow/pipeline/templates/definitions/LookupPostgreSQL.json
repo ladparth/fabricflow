@@ -1,5 +1,5 @@
 {
-  "name": "LookupSQLServer",
+  "name": "LookupPostgreSQL",
   "type": "pipelines",
   "apiVersion": "2018-06-01",
   "properties": {
@@ -17,20 +17,15 @@
         },
         "typeProperties": {
           "source": {
-            "type": "SqlServerSource",
-            "sqlReaderQuery": {
+            "type": "PostgreSqlSource",
+            "query": {
               "value": "@pipeline().parameters.source_query",
               "type": "Expression"
             },
             "queryTimeout": {
               "value": "@pipeline().parameters.query_timeout",
               "type": "Expression"
-            },
-            "isolationLevel": {
-              "value": "@pipeline().parameters.isolation_level",
-              "type": "Expression"
-            },
-            "partitionOption": "None"
+            }
           },
           "firstRowOnly": {
             "value": "@pipeline().parameters.first_row_only",
@@ -38,14 +33,8 @@
           },
           "datasetSettings": {
             "annotations": [],
-            "type": "SqlServerTable",
+            "type": "PostgreSqlTable",
             "schema": [],
-            "typeProperties": {
-              "database": {
-                "value": "@pipeline().parameters.source_database_name",
-                "type": "Expression"
-              }
-            },
             "externalReferences": {
               "connection": "@pipeline().parameters.source_connection_id"
             }
@@ -55,10 +44,8 @@
     ],
     "parameters": {
       "source_connection_id": { "type": "string" },
-      "source_database_name": { "type": "string" },
       "source_query": { "type": "string" },
       "first_row_only": { "type": "bool" },
-      "isolation_level": { "type": "string" },
       "query_timeout": { "type": "string" }
     }
   }

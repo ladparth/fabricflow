@@ -14,7 +14,9 @@ Functions:
 
 Template Categories:
     - Copy Activities: SQL Server to Lakehouse/Parquet with single or batch processing
+    - Copy Activities: Google BigQuery to Lakehouse/Parquet with single processing
     - Lookup Activities: SQL Server lookup operations with optional ForEach loops
+    - Lookup Activities: Google BigQuery lookup operations with optional ForEach loops
 
 All templates support parameterization for connection details, source queries,
 and sink configurations.
@@ -36,8 +38,14 @@ class DataPipelineTemplates(Enum):
     COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE_FOR_EACH = "CopySQLServerToLakehouseTableForEach"
     COPY_SQL_SERVER_TO_PARQUET_FILE = "CopySQLServerToParquetFile"
     COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH = "CopySQLServerToParquetFileForEach"
+    COPY_GOOGLE_BIGQUERY_TO_LAKEHOUSE_TABLE = "CopyGoogleBigQueryToLakehouseTable"
+    COPY_GOOGLE_BIGQUERY_TO_PARQUET_FILE = "CopyGoogleBigQueryToParquetFile"
+    COPY_POSTGRESQL_TO_LAKEHOUSE_TABLE = "CopyPostgreSQLToLakehouseTable"
+    COPY_POSTGRESQL_TO_PARQUET_FILE = "CopyPostgreSQLToParquetFile"
     LOOKUP_SQL_SERVER = "LookupSQLServer"
     LOOKUP_SQL_SERVER_FOR_EACH = "LookupSQLServerForEach"
+    LOOKUP_GOOGLE_BIGQUERY = "LookupGoogleBigQuery"
+    LOOKUP_POSTGRESQL = "LookupPostgreSQL"
 
 
 # Exporting the templates individually for convenience
@@ -51,8 +59,22 @@ COPY_SQL_SERVER_TO_PARQUET_FILE = DataPipelineTemplates.COPY_SQL_SERVER_TO_PARQU
 COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH = (
     DataPipelineTemplates.COPY_SQL_SERVER_TO_PARQUET_FILE_FOR_EACH
 )
+COPY_GOOGLE_BIGQUERY_TO_LAKEHOUSE_TABLE = (
+    DataPipelineTemplates.COPY_GOOGLE_BIGQUERY_TO_LAKEHOUSE_TABLE
+)
+COPY_GOOGLE_BIGQUERY_TO_PARQUET_FILE = (
+    DataPipelineTemplates.COPY_GOOGLE_BIGQUERY_TO_PARQUET_FILE
+)
+COPY_POSTGRESQL_TO_LAKEHOUSE_TABLE = (
+    DataPipelineTemplates.COPY_POSTGRESQL_TO_LAKEHOUSE_TABLE
+)
+COPY_POSTGRESQL_TO_PARQUET_FILE = DataPipelineTemplates.COPY_POSTGRESQL_TO_PARQUET_FILE
+
+# Lookup templates
 LOOKUP_SQL_SERVER = DataPipelineTemplates.LOOKUP_SQL_SERVER
 LOOKUP_SQL_SERVER_FOR_EACH = DataPipelineTemplates.LOOKUP_SQL_SERVER_FOR_EACH
+LOOKUP_GOOGLE_BIGQUERY = DataPipelineTemplates.LOOKUP_GOOGLE_BIGQUERY
+LOOKUP_POSTGRESQL = DataPipelineTemplates.LOOKUP_POSTGRESQL
 
 
 def get_base64_str(file_path: str) -> str:

@@ -107,9 +107,6 @@
       "sink_file_name": { "type": "string" },
       "isolation_level": { "type": "string" },
       "query_timeout": { "type": "string" }
-    },
-    "lastModifiedByObjectId": "f21bfa33-f194-4082-bf1a-48147398c081",
-    "lastPublishTime": "2025-06-27T01:34:56Z"
-  },
-  "dependsOn": []
+    }
+  }
 }
