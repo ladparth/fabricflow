@@ -1,0 +1,169 @@
+{
+  "name": "CopyFilesToLakehouse",
+  "objectId": "d38ea9dd-6fda-4240-b776-f42d3cdc09e7",
+  "properties": {
+    "activities": [
+      {
+        "name": "Copy file",
+        "type": "Copy",
+        "dependsOn": [],
+        "policy": {
+          "retry": 0,
+          "retryIntervalInSeconds": 60,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "BinarySource",
+            "storeSettings": {
+              "type": "FileServerReadSettings",
+              "maxConcurrentConnections": {
+                "value": "@pipeline().parameters.max_concurrent_connections",
+                "type": "Expression"
+              },
+              "recursive": {
+                "value": "@pipeline().parameters.recursive_search",
+                "type": "Expression"
+              },
+              "modifiedDatetimeStart": {
+                "value": "@if(empty(pipeline().parameters.source_modified_after), null, pipeline().parameters.source_modified_after)",
+                "type": "Expression"
+              },
+              "modifiedDatetimeEnd": {
+                "value": "@if(empty(pipeline().parameters.source_modified_before), null, pipeline().parameters.source_modified_before)",
+                "type": "Expression"
+              },
+              "wildcardFolderPath": {
+                "value": "@if(empty(pipeline().parameters.source_folder_pattern), null, pipeline().parameters.source_folder_pattern)",
+                "type": "Expression"
+              },
+              "wildcardFileName": {
+                "value": "@pipeline().parameters.source_file_pattern",
+                "type": "Expression"
+              },
+              "deleteFilesAfterCompletion": {
+                "value": "@pipeline().parameters.delete_source_after_copy",
+                "type": "Expression"
+              }
+            },
+            "formatSettings": {
+              "type": "BinaryReadSettings"
+            },
+            "datasetSettings": {
+              "annotations": [],
+              "type": "Binary",
+              "typeProperties": {
+                "location": {
+                  "type": "FileServerLocation"
+                }
+              },
+              "externalReferences": {
+                "connection": "@pipeline().parameters.source_connection_id"
+              }
+            }
+          },
+          "sink": {
+            "type": "BinarySink",
+            "storeSettings": {
+              "type": "LakehouseWriteSettings",
+              "maxConcurrentConnections": {
+                "value": "@pipeline().parameters.max_concurrent_connections",
+                "type": "Expression"
+              },
+              "copyBehavior": {
+                "value": "@pipeline().parameters.copy_behavior",
+                "type": "Expression"
+              }
+            },
+            "datasetSettings": {
+              "annotations": [],
+              "linkedService": {
+                "name": "9e7402c8_1e89_47fc_b562_5a59d5dab11a",
+                "properties": {
+                  "annotations": [],
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "workspaceId": "@pipeline().parameters.sink_workspace_id",
+                    "artifactId": "@pipeline().parameters.sink_lakehouse_id",
+                    "rootFolder": "Files"
+                  }
+                }
+              },
+              "type": "Binary",
+              "typeProperties": {
+                "location": {
+                  "type": "LakehouseLocation",
+                  "folderPath": {
+                    "value": "@pipeline().parameters.sink_directory",
+                    "type": "Expression"
+                  }
+                }
+              }
+            }
+          },
+          "enableStaging": {
+            "value": "@pipeline().parameters.enable_staging",
+            "type": "Expression"
+          },
+          "parallelCopies": {
+            "value": "@pipeline().parameters.parallel_copies",
+            "type": "Expression"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "source_connection_id": {
+        "type": "string"
+      },
+      "source_folder_pattern": {
+        "type": "string",
+        "defaultValue": "*"
+      },
+      "source_file_pattern": {
+        "type": "string",
+        "defaultValue": "*"
+      },
+      "source_modified_after": {
+        "type": "string"
+      },
+      "source_modified_before": {
+        "type": "string"
+      },
+      "sink_workspace_id": {
+        "type": "string"
+      },
+      "sink_lakehouse_id": {
+        "type": "string"
+      },
+      "sink_directory": {
+        "type": "string"
+      },
+      "delete_source_after_copy": {
+        "type": "bool",
+        "defaultValue": false
+      },
+      "recursive_search": {
+        "type": "bool",
+        "defaultValue": true
+      },
+      "copy_behavior": {
+        "type": "string",
+        "defaultValue": "PreserveHierarchy"
+      },
+      "max_concurrent_connections": {
+        "type": "int",
+        "defaultValue": 10
+      },
+      "parallel_copies": {
+        "type": "int",
+        "defaultValue": 4
+      },
+      "enable_staging": {
+        "type": "bool",
+        "defaultValue": false
+      }
+    }
+  }
+}

@@ -33,6 +33,12 @@ class SourceType(Enum):
     Values:
         SQL_SERVER: Microsoft SQL Server database source.
                    Used for reading data from SQL Server instances.
+        GOOGLE_BIGQUERY: Google BigQuery data warehouse source.
+                         Used for reading data from BigQuery datasets.
+        POSTGRESQL: PostgreSQL database source.
+                    Used for reading data from PostgreSQL instances.
+        FILE_SERVER: File server source.
+                     Used for reading data from files stored on network or local file servers.
 
     Example:
         ```python
@@ -48,6 +54,7 @@ class SourceType(Enum):
     SQL_SERVER = "SQLServer"
     GOOGLE_BIGQUERY = "GoogleBigQuery"
     POSTGRESQL = "PostgreSQL"
+    FILE_SERVER = "FileServer"
 
 
 class IsolationLevel(Enum):

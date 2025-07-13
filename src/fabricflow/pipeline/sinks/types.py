@@ -33,6 +33,8 @@ class SinkType(Enum):
                         Used for writing data to managed tables in a Lakehouse.
         PARQUET_FILE: Parquet file destination in Lakehouse Files.
                      Used for writing data to Parquet files in the Files area.
+        LAKEHOUSE_FILES: Lakehouse Files destination.
+                         Used for writing data directly to the Files area of a Lakehouse.
 
     Example:
         ```python
@@ -54,3 +56,17 @@ class SinkType(Enum):
 
     LAKEHOUSE_TABLE = "LakehouseTable"
     PARQUET_FILE = "ParquetFile"
+    LAKEHOUSE_FILES = "LakehouseFiles"
+
+
+class FileCopyBehavior(Enum):
+    """
+    Enum representing the behavior for copying files in a pipeline.
+
+    Attributes:
+        FLATTEN_HIERARCHY: Copy files into a single directory, ignoring their original folder structure.
+        PRESERVE_HIERARCHY: Maintain the original folder structure when copying files.
+    """
+
+    FLATTEN_HIERARCHY = "FlattenHierarchy"
+    PRESERVE_HIERARCHY = "PreserveHierarchy"
