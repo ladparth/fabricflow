@@ -1,5 +1,5 @@
 {
-  "name": "LookupGoogleBigQuery",
+  "name": "LookupPostgreSQL",
   "type": "pipelines",
   "apiVersion": "2018-06-01",
   "properties": {
@@ -17,9 +17,13 @@
         },
         "typeProperties": {
           "source": {
-            "type": "GoogleBigQuerySource",
+            "type": "PostgreSqlSource",
             "query": {
               "value": "@pipeline().parameters.source_query",
+              "type": "Expression"
+            },
+            "queryTimeout": {
+              "value": "@pipeline().parameters.query_timeout",
               "type": "Expression"
             }
           },
@@ -29,7 +33,7 @@
           },
           "datasetSettings": {
             "annotations": [],
-            "type": "GoogleBigQueryObject",
+            "type": "PostgreSqlTable",
             "schema": [],
             "externalReferences": {
               "connection": "@pipeline().parameters.source_connection_id"
@@ -41,7 +45,8 @@
     "parameters": {
       "source_connection_id": { "type": "string" },
       "source_query": { "type": "string" },
-      "first_row_only": { "type": "bool" }
+      "first_row_only": { "type": "bool" },
+      "query_timeout": { "type": "string" }
     }
   }
 }

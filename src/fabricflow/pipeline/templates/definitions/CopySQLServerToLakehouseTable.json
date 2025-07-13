@@ -72,11 +72,11 @@
               "schema": [],
               "typeProperties": {
                 "schema": {
-                  "value": "@pipeline().parameters.sink_table_name",
+                  "value": "@pipeline().parameters.sink_schema_name",
                   "type": "Expression"
                 },
                 "table": {
-                  "value": "@pipeline().parameters.sink_schema_name",
+                  "value": "@pipeline().parameters.sink_table_name",
                   "type": "Expression"
                 }
               }
@@ -105,9 +105,6 @@
       "sink_table_action": { "type": "string" },
       "isolation_level": { "type": "string" },
       "query_timeout": { "type": "string" }
-    },
-    "lastModifiedByObjectId": "f21bfa33-f194-4082-bf1a-48147398c081",
-    "lastPublishTime": "2025-06-20T21:28:14Z"
-  },
-  "dependsOn": []
+    }
+  }
 }

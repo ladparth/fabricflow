@@ -57,6 +57,8 @@ from fabricflow.pipeline.templates import (
 fabric_client = FabricRestClient()
 ```
 
+> **Note**: If you are using `ServicePrincipalTokenProvider`, please make sure your Service Principal has access to the workspace and connections you are using.
+
 ### 3. Define Workspace and Capacity
 
 ```python
@@ -235,6 +237,7 @@ result = (
 Below are the main classes and functions available in FabricFlow:
 
 ### Core Pipeline Components
+
 - `DataPipelineExecutor` – Execute data pipelines and monitor their status.
 - `DataPipelineError` – Exception class for pipeline errors.
 - `PipelineStatus` – Enum for pipeline run statuses.
@@ -244,10 +247,12 @@ Below are the main classes and functions available in FabricFlow:
 - `create_data_pipeline` – Create a new data pipeline from template.
 
 ### Pipeline Activities
+
 - `Copy` – Build and execute copy activities (replaces `CopyManager`).
 - `Lookup` – Build and execute lookup activities for data validation.
 
 ### Sources and Sinks
+
 - `SQLServerSource` – Define SQL Server as a data source.
 - `BaseSource` – Base class for all data sources.
 - `LakehouseTableSink` – Define a Lakehouse table as a data sink.
@@ -256,6 +261,7 @@ Below are the main classes and functions available in FabricFlow:
 - `SinkType` / `SourceType` – Enums for sink and source types.
 
 ### Workspace and Item Management
+
 - `FabricCoreItemsManager` – Manage core Fabric items via APIs.
 - `FabricWorkspacesManager` – Manage Fabric workspaces via APIs.
 - `get_workspace_id` – Get a workspace ID or return the current one.
@@ -263,6 +269,7 @@ Below are the main classes and functions available in FabricFlow:
 - `FabricItemType` – Enum for Fabric item types.
 
 ### Utilities
+
 - `setup_logging` – Configure logging for diagnostics.
 - `resolve_connection_id` – Resolve a connection by name or ID.
 - `resolve_capacity_id` – Resolve a capacity by name or ID.

@@ -146,21 +146,23 @@ class GoogleBigQuerySource(BaseSource):
         self,
         source_connection_id: str,
         source_query: Optional[str] = None,
+        first_row_only: Optional[bool] = None,
     ) -> None:
-
         super().__init__()
 
-        # Validate required parameters
         if not source_connection_id:
             raise ValueError("source_connection_id cannot be empty.")
+        if first_row_only is not None and not isinstance(first_row_only, bool):
+            raise ValueError("first_row_only must be a boolean value.")
 
-        # Set instance attributes
         self.source_connection_id = source_connection_id
         self.source_query = source_query
+        self.first_row_only = first_row_only
 
         logger.info(
             f"GoogleBigQuerySource initialized: source_connection_id='{source_connection_id}', "
-            f"source_query='{(source_query[:50] + '...') if source_query else None}'"
+            f"source_query='{(source_query[:50] + '...') if source_query else None}', "
+            f"first_row_only={first_row_only}"
         )
 
     @property
@@ -210,5 +212,7 @@ class GoogleBigQuerySource(BaseSource):
 
         if self.source_query:
             result["source_query"] = self.source_query
+        if self.first_row_only is not None:
+            result["first_row_only"] = self.first_row_only
 
         return result

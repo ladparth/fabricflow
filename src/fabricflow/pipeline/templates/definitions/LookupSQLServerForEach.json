@@ -70,9 +70,6 @@
       "source_connection_id": { "type": "string" },
       "source_database_name": { "type": "string" },
       "items": { "type": "array" }
-    },
-    "lastModifiedByObjectId": "f21bfa33-f194-4082-bf1a-48147398c081",
-    "lastPublishTime": "2025-07-07T14:11:09Z"
-  },
-  "dependsOn": []
+    }
+  }
 }
