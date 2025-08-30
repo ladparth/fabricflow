@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2025-08-30
+
+### Added
+
+- Support for custom pipeline templates via dict, enum, or file path in `create_data_pipeline` function.
+- Refactored `get_base64_str` and `get_template` functions for flexible input handling.
+- Improved display name resolution for pipelines from various template sources.
+- Enhanced type hints and documentation for better clarity.
+
 ## [0.1.4] - 2025-07-13
 
 ### Added
