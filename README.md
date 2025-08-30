@@ -80,6 +80,8 @@ create_workspace(fabric_client, workspace_name, capacity_name)
 
 You can also create individual data pipeline templates by selecting specific templates from the list.
 
+> **New Feature**: You can now use custom pipeline templates by passing a dict (json payload), enum, or file path to `create_data_pipeline`.
+
 ```python
 for template in DataPipelineTemplates:
     create_data_pipeline(
@@ -257,7 +259,7 @@ source = FileSystemSource(
 # Define lakehouse files sink
 sink = LakehouseFilesSink(
     sink_lakehouse="data-lakehouse",
-    sink_workspace="analytics-workspace", 
+    sink_workspace="analytics-workspace",
     sink_directory="processed/files",         # Target directory in lakehouse
     copy_behavior=FileCopyBehavior.PRESERVE_HIERARCHY,  # Maintain folder structure
     enable_staging=False,                     # Direct copy without staging
