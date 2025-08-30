@@ -1,35 +1,9 @@
-"""
-Microsoft Fabric data pipeline utility functions.
-
-This module provides high-level utility functions for creating and managing
-data pipelines in Microsoft Fabric. It simplifies common pipeline operations
-by wrapping the lower-level API calls with convenient interfaces.
-
-Functions:
-    create_data_pipeline: Create a new data pipeline from a template.
-
-These utilities work with the template system to provide quick deployment
-of pre-configured pipeline patterns for common data integration scenarios.
-
-Example:
-    ```python
-    from sempy.fabric import FabricRestClient
-    from fabricflow.pipeline.utils import create_data_pipeline
-    from fabricflow.pipeline.templates import DataPipelineTemplates
-
-    client = FabricRestClient()
-    pipeline = create_data_pipeline(
-        client,
-        DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE,
-        workspace="MyWorkspace"
-    )
-    ```
-"""
+"""Microsoft Fabric data pipeline utility functions."""
 
 import logging
 from logging import Logger
 from sempy.fabric import FabricRestClient
-from typing import Optional
+from typing import Any, Dict, Optional, Union
 from .templates import DataPipelineTemplates, get_template
 from ..core.items.manager import FabricCoreItemsManager
 from ..core.items.types import FabricItemType
@@ -39,73 +13,61 @@ logger: Logger = logging.getLogger(__name__)
 
 def create_data_pipeline(
     client: FabricRestClient,
-    template: DataPipelineTemplates,
+    template: Union[DataPipelineTemplates, Dict[str, Any], str],
     workspace: Optional[str] = None,
+    display_name: Optional[str] = None,
 ) -> dict:
     """
-    Create a Microsoft Fabric data pipeline using a predefined template.
+    Create a Microsoft Fabric data pipeline using a template, JSON definition, or file path.
 
-    This function creates a new data pipeline in the specified workspace using
-    one of the available templates. Templates provide pre-configured pipeline
-    definitions for common data integration patterns.
-
-    The pipeline will be created with the template name as the display name
-    and will be ready for parameterization and execution.
+    Supports:
+        - DataPipelineTemplates enum value (predefined template)
+        - dict (pipeline JSON definition)
+        - str (file path to pipeline definition)
 
     Args:
         client (FabricRestClient): Authenticated Fabric REST client instance.
-        template (DataPipelineTemplates): The template to use for pipeline creation.
-                                         Must be a value from the DataPipelineTemplates enum.
-        workspace (Optional[str]): Target workspace name or ID. If None, uses the
-                                  current default workspace.
+        template (DataPipelineTemplates | dict | str): Template enum, pipeline JSON dict, or file path.
+        workspace (Optional[str]): Target workspace name or ID. If None, uses the default workspace.
+        display_name (Optional[str]): Display name for the pipeline. if file path is provided, the file name will be used as the display name.
 
     Returns:
-        dict: Dictionary containing the created pipeline details including:
-             - id: Pipeline ID
-             - displayName: Pipeline display name (same as template name)
-             - type: Item type (always "DataPipeline")
-             - workspaceId: Workspace ID where pipeline was created
+        dict: Details of the created pipeline (id, displayName, type, workspaceId).
 
     Raises:
         FileNotFoundError: If the template file cannot be found.
-        Exception: If pipeline creation fails due to permissions or other issues.
+        Exception: If pipeline creation fails.
 
     Example:
-        ```python
-        from sempy.fabric import FabricRestClient
-        from fabricflow.pipeline.utils import create_data_pipeline
-        from fabricflow.pipeline.templates import DataPipelineTemplates
-
-        client = FabricRestClient()
-
-        # Create a copy pipeline template
-        pipeline = create_data_pipeline(
-            client,
-            DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE,
-            workspace="MyWorkspace"
-        )
-
-        print(f"Created pipeline: {pipeline['displayName']} (ID: {pipeline['id']})")
-        ```
-
-    Note:
-        The created pipeline will contain parameter placeholders that need to be
-        populated when executing the pipeline. Use the Copy or Lookup classes
-        to execute the pipeline with appropriate parameters.
+        pipeline = create_data_pipeline(client, DataPipelineTemplates.COPY_SQL_SERVER_TO_LAKEHOUSE_TABLE, workspace="MyWorkspace")
+        pipeline = create_data_pipeline(client, {"name": "MyPipeline", "properties": {"activities": [...] }}, workspace="MyWorkspace")
+        pipeline = create_data_pipeline(client, "path/to/pipeline.json", workspace="MyWorkspace")
     """
+    # Validate template type
+
+    if not isinstance(template, (DataPipelineTemplates, dict, str)):
+        raise TypeError(
+            "template must be a DataPipelineTemplates enum, a dict (pipeline definition), or a str (file path)"
+        )
 
     # Get the base64-encoded template definition in correct format
     definition_dict: dict = get_template(template)
 
-    # Prepare the payload for FabricCoreItemsManager
-    items_manager: FabricCoreItemsManager = FabricCoreItemsManager(client, workspace)
+    # Resolve display name
+    resolved_display_name: str = display_name or definition_dict.get(
+        "displayName", "Untitled Pipeline"
+    )
 
     # Only pass supported parameters to create_item
     logger.info(
-        f"Creating data pipeline with template: {template.value} in workspace: {workspace}"
+        f"Creating data pipeline with template: {resolved_display_name} in workspace: {workspace}"
     )
+
+    # Prepare the payload for FabricCoreItemsManager
+    items_manager: FabricCoreItemsManager = FabricCoreItemsManager(client, workspace)
+
     return items_manager.create_item(
-        display_name=template.value,
+        display_name=resolved_display_name,
         item_type=FabricItemType.DATA_PIPELINE,
         definition=definition_dict["definition"],
     )
