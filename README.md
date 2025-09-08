@@ -313,6 +313,7 @@ Below are the main classes and functions available in FabricFlow:
 ### Workspace and Item Management
 
 - `FabricCoreItemsManager` – Manage core Fabric items via APIs.
+- `FabricFoldersManager` – Manage Fabric folders via APIs.
 - `FabricWorkspacesManager` – Manage Fabric workspaces via APIs.
 - `get_workspace_id` – Get a workspace ID or return the current one.
 - `create_workspace` – Create a new workspace and assign to a capacity.

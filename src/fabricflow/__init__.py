@@ -78,6 +78,8 @@ from .pipeline.sources import (
 # Core items and workspaces
 from .core.items.manager import FabricCoreItemsManager
 from .core.items.types import FabricItemType
+from .core.folders.manager import FabricFoldersManager
+from .core.folders.utils import resolve_folder
 from .core.workspaces.utils import get_workspace_id
 from .core.workspaces.manager import FabricWorkspacesManager
 from .core.utils import create_workspace
@@ -117,6 +119,8 @@ __all__: list[str] = [
     # Core items and workspaces
     "FabricCoreItemsManager",
     "FabricItemType",
+    "FabricFoldersManager",
+    "resolve_folder",
     "get_workspace_id",
     "FabricWorkspacesManager",
     "create_workspace",
