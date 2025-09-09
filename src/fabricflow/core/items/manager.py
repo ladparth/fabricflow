@@ -16,7 +16,7 @@ and provides type-safe operations with comprehensive error handling.
 Supported Item Types:
     All item types defined in FabricItemType enum are supported, including:
     - Data Storage: Lakehouses, Warehouses, SQL Databases
-    - Analytics: Reports, Dashboards, Semantic Models  
+    - Analytics: Reports, Dashboards, Semantic Models
     - Data Processing: Data Pipelines, Dataflows, Notebooks
     - Real-time: Eventstreams, Eventhouses, KQL components
     - Machine Learning: ML Models, ML Experiments
@@ -43,34 +43,34 @@ Example:
     from sempy.fabric import FabricRestClient
     from fabricflow.core.items.manager import FabricCoreItemsManager
     from fabricflow.core.items.types import FabricItemType
-    
+
     client = FabricRestClient()
     manager = FabricCoreItemsManager(client, "MyWorkspace")
-    
+
     # Create a new Lakehouse
     lakehouse = manager.create_item(
         display_name="Sales Data Lakehouse",
         item_type=FabricItemType.LAKEHOUSE
     )
-    
+
     # Create a data pipeline with definition
     pipeline = manager.create_item(
         display_name="ETL Pipeline",
         item_type=FabricItemType.DATA_PIPELINE,
         definition=pipeline_definition
     )
-    
+
     # List all items in workspace
     items = manager.list_items(paged=True)
-    
+
     # Get specific item details
     item_details = manager.get_item(lakehouse['id'])
-    
+
     # Update item description
     manager.update_item(lakehouse['id'], {
         'description': 'Updated lakehouse for sales analytics'
     })
-    
+
     # Delete item
     manager.delete_item(pipeline['id'])
     ```
@@ -78,7 +78,7 @@ Example:
 Security Note:
     All operations require appropriate Microsoft Fabric permissions for the target
     workspace. Item deletion is permanent and cannot be undone.
-    
+
 Dependencies:
     - sempy.fabric: For FabricRestClient integration
     - fabricflow.core.workspaces.utils: For workspace ID resolution
@@ -88,6 +88,7 @@ Dependencies:
 from typing import Optional, Dict, Any
 from sempy.fabric import FabricRestClient
 from ..workspaces.utils import get_workspace_id
+from ..folders.utils import resolve_folder
 from .types import FabricItemType
 
 
@@ -122,6 +123,7 @@ class FabricCoreItemsManager:
         display_name: str,
         item_type: FabricItemType,
         definition: Optional[Any] = None,
+        folder: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Create a new item in the Fabric workspace.
@@ -130,11 +132,15 @@ class FabricCoreItemsManager:
             display_name (str): The display name for the item.
             item_type (FabricItemType): The type of item to create.
             definition (Optional[Any]): The item definition (optional).
+            Folder (Optional[str]): A folder (Name or Id) to place the item in.
 
         Returns:
             Dict[str, Any]: The created item details as a dictionary.
         """
-        payload: Dict[str, Any] = {"displayName": display_name, "type": item_type.value}
+        payload: Dict[str, Any] = {
+            "displayName": display_name,
+            "type": item_type.value,
+            "folderId": resolve_folder(folder)}
         if definition is not None:
             payload["definition"] = definition
         url: str = f"/v1/workspaces/{self.workspace_id}/items"

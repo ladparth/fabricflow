@@ -16,6 +16,7 @@ def create_data_pipeline(
     template: Union[DataPipelineTemplates, Dict[str, Any], str],
     workspace: Optional[str] = None,
     display_name: Optional[str] = None,
+    folder: Optional[str] = None,
 ) -> dict:
     """
     Create a Microsoft Fabric data pipeline using a template, JSON definition, or file path.
@@ -30,6 +31,7 @@ def create_data_pipeline(
         template (DataPipelineTemplates | dict | str): Template enum, pipeline JSON dict, or file path.
         workspace (Optional[str]): Target workspace name or ID. If None, uses the default workspace.
         display_name (Optional[str]): Display name for the pipeline. if file path is provided, the file name will be used as the display name.
+        folder (Optional[str]): Folder in which to create the pipeline. Defaults to workspace base.
 
     Returns:
         dict: Details of the created pipeline (id, displayName, type, workspaceId).
@@ -70,4 +72,5 @@ def create_data_pipeline(
         display_name=resolved_display_name,
         item_type=FabricItemType.DATA_PIPELINE,
         definition=definition_dict["definition"],
+        folder=folder
     )
