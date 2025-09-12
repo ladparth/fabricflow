@@ -1,9 +1,11 @@
+"""Base REST client with retries and error handling."""
+
 import requests
 from abc import ABC, abstractmethod
 from typing import Dict, Optional, Any
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from fabricflow.auth import BaseTokenProvider
+from ..auth import BaseTokenProvider, DefaultTokenProvider
 import logging
 
 logger = logging.getLogger(__name__)
@@ -23,12 +25,12 @@ class BaseRestClient(ABC):
 
     def __init__(
         self,
-        token_provider: BaseTokenProvider,
+        token_provider: Optional[BaseTokenProvider] = None,
         retry_config: Optional[Dict] = None,
     ):
         self.base_url = self._get_base_url()
         self.session = requests.Session()
-        self.token_provider = token_provider
+        self.token_provider = token_provider or DefaultTokenProvider()
 
         # Configure retries
         retry_config = retry_config or {}
