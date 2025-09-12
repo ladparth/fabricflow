@@ -1,8 +1,10 @@
+"""Fabric REST API client implementation."""
+
 import json
 from typing import Dict
 from tqdm import tqdm
 import requests
-from fabricflow.auth.base import BaseTokenProvider
+from ..auth import BaseTokenProvider
 from .base import BaseRestClient
 from typing import Optional
 import logging
@@ -39,7 +41,9 @@ class FabricHTTPException(requests.HTTPError):
 class FabricRestClient(BaseRestClient):
 
     def __init__(
-        self, token_provider: BaseTokenProvider, retry_config: Dict | None = None
+        self,
+        token_provider: Optional[BaseTokenProvider] = None,
+        retry_config: Dict | None = None,
     ):
         super().__init__(token_provider, retry_config)
 

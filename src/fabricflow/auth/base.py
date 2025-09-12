@@ -1,3 +1,5 @@
+"""Base class for auth token providers."""
+
 from abc import ABC, abstractmethod
 from typing import Literal
 
@@ -8,13 +10,13 @@ class BaseTokenProvider(ABC):
     """
 
     @abstractmethod
-    def __call__(self, audience: Literal["pbi", "storage"] = "pbi") -> str:
+    def __call__(self, audience: Literal["pbi", "storage", "sql"] = "pbi") -> str:
         """
         Get implementation specific token.
 
         Parameters
         ----------
-        audience : Literal["pbi", "storage"]
+        audience : Literal["pbi", "storage", "sql"], optional
             The audience for which the token is requested.
             Defaults to "pbi".
         Returns
