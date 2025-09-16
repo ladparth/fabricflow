@@ -64,7 +64,7 @@ from .log_utils import setup_logging
 from .pipeline.executor import DataPipelineExecutor, DataPipelineError, PipelineStatus
 from .pipeline.activities import Copy, Lookup
 from .pipeline.templates import DataPipelineTemplates, get_template, get_base64_str
-from .pipeline.utils import create_data_pipeline
+from .pipeline.utils import create_data_pipeline, update_data_pipeline
 
 # Pipeline sources and sinks
 from .pipeline.sinks import LakehouseTableSink, ParquetFileSink, BaseSink, SinkType
@@ -104,6 +104,7 @@ __all__: list[str] = [
     "get_template",
     "get_base64_str",
     "create_data_pipeline",
+    "update_data_pipeline",
     "CopyManager",
     "Copy",
     "Lookup",

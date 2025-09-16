@@ -71,6 +71,12 @@ Example:
         'description': 'Updated lakehouse for sales analytics'
     })
 
+    # Update item definition
+    manager.update_item_def(
+        pipeline['id'],
+        new_pipeline_definition
+    )
+
     # Delete item
     manager.delete_item(pipeline['id'])
     ```
@@ -178,6 +184,24 @@ class FabricCoreItemsManager:
         response = self.client.patch(url, json=updates)
         response.raise_for_status()
         return response.json()
+
+    def update_item_def(self, item_id: str, definition: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Update an existing item in the Fabric workspace.
+
+        Args:
+            item_id (str): The ID of the item to update.
+            updates (Dict[str, Any]): The fields to update.
+
+        Returns:
+            Dict[str, Any]: The updated item details as a dictionary.
+        """
+        url: str = f"/v1/workspaces/{self.workspace_id}/items/{item_id}/updateDefinition"
+        payload: Dict[str, Any] = {"definition": definition}
+        response = self.client.post(url, json=payload)
+        response.raise_for_status()
+        # endpoint does not return a json response
+        return {}
 
     def delete_item(self, item_id: str) -> None:
         """
