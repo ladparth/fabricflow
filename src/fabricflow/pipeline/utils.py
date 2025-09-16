@@ -81,8 +81,8 @@ def create_data_pipeline(
 def update_data_pipeline(
     client: FabricRestClient,
     template: Union[DataPipelineTemplates, Dict[str, Any], str],
-    display_name: Optional[str],
     workspace: Optional[str] = None,
+    display_name: Optional[str] = None,
 ) -> dict:
     """
     Create a Microsoft Fabric data pipeline using a template, JSON definition, or file path.
