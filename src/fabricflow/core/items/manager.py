@@ -145,10 +145,12 @@ class FabricCoreItemsManager:
         """
         payload: Dict[str, Any] = {
             "displayName": display_name,
-            "type": item_type.value,
-            "folderId": resolve_folder(folder)}
+            "type": item_type.value}
+        if folder is not None:
+            payload["folderId"] = resolve_folder(folder)
         if definition is not None:
             payload["definition"] = definition
+
         url: str = f"/v1/workspaces/{self.workspace_id}/items"
         response = self.client.post(url, json=payload)
         response.raise_for_status()
