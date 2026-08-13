@@ -91,10 +91,12 @@ Dependencies:
     - fabricflow.core.items.types: For FabricItemType definitions
 """
 
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
 from sempy.fabric import FabricRestClient
-from ..workspaces.utils import get_workspace_id
+
 from ..folders.utils import resolve_folder
+from ..workspaces.utils import get_workspace_id
 from .types import FabricItemType
 
 
@@ -129,7 +131,7 @@ class FabricCoreItemsManager:
         display_name: str,
         item_type: FabricItemType,
         definition: Optional[Any] = None,
-        folder: Optional[str] = None
+        folder: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Create a new item in the Fabric workspace.
@@ -143,9 +145,7 @@ class FabricCoreItemsManager:
         Returns:
             Dict[str, Any]: The created item details as a dictionary.
         """
-        payload: Dict[str, Any] = {
-            "displayName": display_name,
-            "type": item_type.value}
+        payload: Dict[str, Any] = {"displayName": display_name, "type": item_type.value}
         if folder is not None:
             payload["folderId"] = resolve_folder(folder)
         if definition is not None:
@@ -171,6 +171,27 @@ class FabricCoreItemsManager:
         response.raise_for_status()
         return response.json()
 
+    def get_item_def(
+        self, item_id: str, format: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Retrieve an item with definition by its ID from the Fabric workspace.
+
+        Args:
+            item_id (str): The ID of the item to retrieve.
+            format (Optional[str]): The format of the definition to retrieve.
+
+        Returns:
+            Dict[str, Any]: The item details as a dictionary.
+        """
+        url: str = f"/v1/workspaces/{self.workspace_id}/items/{item_id}/getDefinition"
+        params = {}
+        if format is not None:
+            params["format"] = format
+        response = self.client.post(url, params=params)
+        response.raise_for_status()
+        return response.json()
+
     def update_item(self, item_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:
         """
         Update an existing item in the Fabric workspace.
@@ -187,23 +208,46 @@ class FabricCoreItemsManager:
         response.raise_for_status()
         return response.json()
 
-    def update_item_def(self, item_id: str, definition: Dict[str, Any]) -> Dict[str, Any]:
+    def update_item_def(
+        self, item_id: str, definition: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
-        Update an existing item in the Fabric workspace.
+        Update an existing item's definition in the Fabric workspace.
 
         Args:
             item_id (str): The ID of the item to update.
-            updates (Dict[str, Any]): The fields to update.
+            definition (Dict[str, Any]): The new definition for the item.
 
         Returns:
             Dict[str, Any]: The updated item details as a dictionary.
         """
-        url: str = f"/v1/workspaces/{self.workspace_id}/items/{item_id}/updateDefinition"
+        url: str = (
+            f"/v1/workspaces/{self.workspace_id}/items/{item_id}/updateDefinition"
+        )
+
         payload: Dict[str, Any] = {"definition": definition}
         response = self.client.post(url, json=payload)
         response.raise_for_status()
         # endpoint does not return a json response
         return {}
+
+    def move_item(self, item_id: str, folder: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Move an item to a different folder in the Fabric workspace.
+
+        Args:
+            item_id (str): The ID of the item to move.
+            folder Optional(str): The ID or Name of the folder to move the item to. Default to None, which will move the item to the root folder.
+        """
+        url: str = f"/v1/workspaces/{self.workspace_id}/items/{item_id}/move"
+
+        payload: Dict[str, Any] = {}
+        if folder is not None:
+            payload["targetFolderId"] = resolve_folder(folder)
+        response = self.client.post(url, json=payload)
+        response.raise_for_status()
+
+        return response.json()
 
     def delete_item(self, item_id: str) -> None:
         """
